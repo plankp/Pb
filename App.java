@@ -49,6 +49,14 @@ public class App
 	  {
 	    tokens.add(new Token(TokenType.TEXT, matcher.group(TokenType.TEXT.name())));
 	  }
+	else if (matcher.group(TokenType.LPAREN.name()) != null)
+	  {
+	    tokens.add(new Token(TokenType.LPAREN, matcher.group(TokenType.LPAREN.name())));
+	  }
+	else if (matcher.group(TokenType.RPAREN.name()) != null)
+	  {
+	    tokens.add(new Token(TokenType.RPAREN, matcher.group(TokenType.RPAREN.name())));
+	  }
 	else
 	  {
 	    throw new RuntimeException("Syntax error. Start:" + matcher.start() + " Text:" + matcher.group());
@@ -109,6 +117,22 @@ public class App
       {
 	String rawstr = tok.data;
 	result.set(rawstr.substring(2));
+      }
+    else if (tok.type == TokenType.LPAREN)
+      {
+	int bracketsBalance = 1;
+	List<Token> bracketsExpr = new ArrayList<>();
+	for (counter++; counter < toks.size(); counter++)
+	  {
+	    final Token brtok = toks.get(counter);
+	    if (brtok.type == TokenType.LPAREN) bracketsBalance++;
+	    else if (brtok.type == TokenType.RPAREN) bracketsBalance--;
+	    
+	    if (bracketsBalance == 0) break;
+	    bracketsExpr.add(brtok);
+	  }
+	Tuple<Integer, Data> expr = visitValue(0, bracketsExpr);
+	result = expr.getRight();
       }
     else
       {
