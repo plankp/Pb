@@ -6,43 +6,8 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-public class Lexer
+public class App
 {
-  public static enum TokenType
-  {
-    TEXT("# .*[\r\n]?"),
-    ASSIGN(".="),
-    BINARYOP("\\*|/|\\+|-|%"),
-    NUMBER("_?(0|([1-9][0-9]*))(\\.[0-9]+)?"),
-    WHITESPACE("[ \t\f\r\n]+"),
-    READ("@."),
-    COMMENT("."); // Ok... Anything we don't care is a comment right?
-
-    public final String pattern;
-
-    private TokenType(String pattern)
-    {
-      this.pattern = pattern;
-    }
-  }
-
-  public static class Token
-  {
-    public TokenType type;
-    public String data;
-
-    public Token(TokenType type, String data)
-    {
-      this.type = type;
-      this.data = data;
-    }
-
-    @Override
-    public String toString() {
-      return String.format("(%s %s)", type.name(), data);
-    }
-  }
-  
   private final static Map<Character, Data> varmap = new HashMap<>();
   
   public static List<Token> lex(String input)
@@ -106,10 +71,11 @@ public class Lexer
 	  {
 	    char id = tok.data.charAt(0);
 	    Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
-	    counter = tuple.left;
-	    final Data tmpd = tuple.right;
-	    varmap.put(id, tmpd);
+	    counter = tuple.getLeft();
+	    final Data tmpd = tuple.getRight();
+	    
 	    if (id == ' ') System.out.println(tmpd);
+	    else varmap.put(id, tmpd);
 	  }
 	else
 	  {
@@ -118,70 +84,10 @@ public class Lexer
       }
   }
   
-  public final static class Tuple<T, U>
-  {
-    private T left;
-    private U right;
-    
-    public Tuple()
-    {
-    }
-    
-    public Tuple(T t, U u)
-    {
-      set(t, u);
-    }
-
-    public Tuple(Tuple<? extends T, ? extends U> tuple)
-    {
-      set(tuple);
-    }
-
-    public T getLeft()
-    {
-      return left;
-    }
-
-    public U getRight()
-    {
-      return right;
-    }
-    
-    public void setLeft(T t)
-    {
-      left = t;
-    }
-    
-    public void setRight(U u)
-    {
-      right = u;
-    }
-    
-    public void set(T t, U u)
-    {
-      left = t;
-      right = u;
-    }
-    
-    public void set(Tuple<? extends T, ? extends U> tuple)
-    {
-      left = tuple.left;
-      right = tuple.right;
-    }
-
-    @Override
-    public String toString()
-    {
-      return "(" + left + "," + right + ")";
-    }
-  }
-  
-  private static final Data EMPTY_DATA = new Data("");
-  
   public static Tuple<Integer, Data> visitValue(int counter,
 						final List<Token> toks)
   {
-    Data result = EMPTY_DATA;
+    Data result = Data.EMPTY_DATA;
     Token tok = toks.get(counter);
     if (tok.type == TokenType.READ)
       {
@@ -216,8 +122,8 @@ public class Lexer
 	    final String op = tok.data;
 	    Data clone = result.copy();
 	    Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
-	    counter = tuple.left;
-	    Data tmprst = tuple.right;
+	    counter = tuple.getLeft();
+	    Data tmprst = tuple.getRight();
 	    result = clone;
 	    
 	    switch (op)

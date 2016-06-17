@@ -1,7 +1,11 @@
 import java.io.Serializable;
 
-public class Data implements Serializable
+public final class Data implements Serializable
 {
+
+  // Use this as placeholder value
+  public static final Data EMPTY_DATA = new Data("");
+  
   private final long serialVersionUID = -128348263L;
 
   private Object data;
