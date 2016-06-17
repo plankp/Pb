@@ -2,6 +2,7 @@ public enum TokenType
 {
   // NOTE: No underscore in token type names
   TEXT("# .*[\r\n]?"),
+  RTEXT("%%.*%%"),
   ASSIGN(".="),
   BINARYOP("\\*|/|\\+|-|%"),
   NUMBER("_?(0|([1-9][0-9]*))(\\.[0-9]+)?"),

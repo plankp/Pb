@@ -49,6 +49,10 @@ public class App
 	  {
 	    tokens.add(new Token(TokenType.TEXT, matcher.group(TokenType.TEXT.name())));
 	  }
+	else if (matcher.group(TokenType.RTEXT.name()) != null)
+	  {
+	    tokens.add(new Token(TokenType.RTEXT, matcher.group(TokenType.RTEXT.name())));
+	  }
 	else if (matcher.group(TokenType.LPAREN.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.LPAREN, matcher.group(TokenType.LPAREN.name())));
@@ -117,6 +121,15 @@ public class App
       {
 	String rawstr = tok.data;
 	result.set(rawstr.substring(2));
+      }
+    else if (tok.type == TokenType.RTEXT)
+      {
+	String rawstr = tok.data;
+	int len = rawstr.length();
+	if (len > 4)
+	  {
+	    result.set(rawstr.substring(2, len - 2));
+	  }
       }
     else if (tok.type == TokenType.LPAREN)
       {
