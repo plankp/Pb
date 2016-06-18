@@ -180,6 +180,9 @@ public class App
 	      case "%":
 		result.modulo(tmprst);
 		break;
+	      case ":":
+		result.subscript(tmprst);
+		break;
 	      }
 	  }
       }

@@ -70,6 +70,12 @@ public final class Data implements Serializable
     if (d.numberFlag) modulo((double) d.data);
     else modulo(d.data.toString());
   }
+
+  public void subscript (Data d)
+  {
+    if (d.numberFlag) subscript((double) d.data);
+    else subscript(d.data.toString());
+  }
   
   public void plus (String s)
   {
@@ -152,6 +158,22 @@ public final class Data implements Serializable
       }
   }
 
+  public void subscript (String s)
+  {
+    numberFlag = true;
+    data = data.toString().indexOf(s) + 0.0;
+  }
+  
+  public void subscript (double d)
+  {
+    if (numberFlag)
+      {
+	numberFlag = false;
+	data = String.valueOf(data.toString().charAt((int) d));
+      }
+    else data = String.valueOf(((String) data).charAt((int) d));
+  }
+  
   public Data copy()
   {
     if (numberFlag) return new Data((double) data);
