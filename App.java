@@ -84,7 +84,7 @@ public class App
 	    char id = tok.data.charAt(0);
 	    Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
 	    counter = tuple.getLeft();
-	    final Data tmpd = tuple.getRight();
+	    final Data tmpd = tuple.getRight().copy();
 	    
 	    if (id == ' ') System.out.println(tmpd);
 	    else varmap.put(id, tmpd);
