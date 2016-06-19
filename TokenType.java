@@ -10,6 +10,8 @@ public enum TokenType
   READ("@."),
   LPAREN("\\("),
   RPAREN("\\)"),
+  LTUPLE("\\{"),
+  RTUPLE("\\}"),
   COMMENT(".");	   // Ok... Anything we don't care is a comment right?
     
   public final String pattern;

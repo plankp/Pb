@@ -61,6 +61,14 @@ public class App
 	  {
 	    tokens.add(new Token(TokenType.RPAREN, matcher.group(TokenType.RPAREN.name())));
 	  }
+	else if (matcher.group(TokenType.LTUPLE.name()) != null)
+	  {
+	    tokens.add(new Token(TokenType.LTUPLE, matcher.group(TokenType.LTUPLE.name())));
+	  }
+	else if (matcher.group(TokenType.RTUPLE.name()) != null)
+	  {
+	    tokens.add(new Token(TokenType.RTUPLE, matcher.group(TokenType.RTUPLE.name())));
+	  }
 	else
 	  {
 	    throw new RuntimeException("Syntax error. Start:" + matcher.start() + " Text:" + matcher.group());
@@ -99,14 +107,14 @@ public class App
   public static Tuple<Integer, Data> visitValue(int counter,
 						final List<Token> toks)
   {
-    Data result = Data.EMPTY_DATA;
+    Data result = DEmpty.getInstance();
     Token tok = toks.get(counter);
     if (tok.type == TokenType.READ)
       {
 	char id = tok.data.charAt(1);
 	if (id == ' ')
 	  {
-	    if (SYSIN.hasNextLine()) result.set(SYSIN.nextLine());
+	    if (SYSIN.hasNextLine()) result = new DString(SYSIN.nextLine());
 	    // otherwise, result stores an empty string
 	  }
 	else result = varmap.get(id);
@@ -115,21 +123,20 @@ public class App
       {
 	String rawnum = tok.data;
 	if (rawnum.charAt(0) == '_') rawnum = "-" + rawnum.substring(1);
-	result.set(Double.parseDouble(rawnum));
+	result = new DNumber(Double.parseDouble(rawnum));
       }
     else if (tok.type == TokenType.TEXT)
       {
 	String rawstr = tok.data;
-	result.set(rawstr.substring(2));
+	result = new DString(rawstr.substring(2));
       }
     else if (tok.type == TokenType.RTEXT)
       {
 	String rawstr = tok.data;
 	int len = rawstr.length();
-	if (len > 4)
-	  {
-	    result.set(rawstr.substring(2, len - 2));
-	  }
+
+	if (len == 4) result = new DString("");
+	else result = new DString(rawstr.substring(2, len - 2));
       }
     else if (tok.type == TokenType.LPAREN)
       {
@@ -146,6 +153,33 @@ public class App
 	  }
 	Tuple<Integer, Data> expr = visitValue(0, bracketsExpr);
 	result = expr.getRight();
+      }
+    else if (tok.type == TokenType.LTUPLE)
+      {
+	int bracketsBalance = 1;
+	List<Token> bracketsExpr = new ArrayList<>();
+	for (counter++; counter < toks.size(); counter++)
+	  {
+	    final Token brtok = toks.get(counter);
+	    if (brtok.type == TokenType.LTUPLE) bracketsBalance++;
+	    else if (brtok.type == TokenType.RTUPLE) bracketsBalance--;
+	    
+	    if (bracketsBalance == 0) break;
+	    bracketsExpr.add(brtok);
+	  }
+	int oldCounter = -1;
+	int elmCounter = 0;
+
+	List<Data> tupleData = new ArrayList<>();
+	while (oldCounter != elmCounter)
+	  {
+	    final Tuple<Integer, Data> expr =
+	      visitValue(elmCounter, bracketsExpr);
+	    oldCounter = elmCounter;
+	    elmCounter = expr.getLeft();
+	    tupleData.add(expr.getRight().copy());
+	  }
+	result = new DTuple(tupleData);
       }
     else
       {
@@ -166,22 +200,22 @@ public class App
 	    switch (op)
 	      {
 	      case "+":
-		result.plus(tmprst);
+		result = result.plus(tmprst);
 		break;
 	      case "-":
-		result.minus(tmprst);
+		result = result.minus(tmprst);
 		break;
 	      case "*":
-		result.times(tmprst);
+		result = result.times(tmprst);
 		break;
 	      case "/":
-		result.divide(tmprst);
+		result = result.divide(tmprst);
 		break;
 	      case "%":
-		result.modulo(tmprst);
+		result = result.modulo(tmprst);
 		break;
 	      case ":":
-		result.subscript(tmprst);
+		result = result.subscript(tmprst);
 		break;
 	      }
 	  }
