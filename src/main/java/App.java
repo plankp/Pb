@@ -153,6 +153,10 @@ public class App
 	      case ' ':
 		System.out.println(tmpd);
 		break;
+	      case '\t':
+		System.err.println(tmpd);
+	      case '_':
+		break;
 	      case '!':
 		throw new RuntimeException(tmpd.toString());
 	      default:
@@ -186,9 +190,20 @@ public class App
 	      {
 	      case ' ':		// Yields user input
 		if (SYSIN.hasNextLine()) result = new DString(SYSIN.nextLine());
-	    else result = new DString("");
+		else result = new DString("");
+		break;
+	      case '\t':
+		if (SYSIN.hasNextDouble())
+		  {
+		    result = new DNumber(SYSIN.nextDouble());
+		  }
+		else result = new DNumber(0);
+		break;
+	      case '_':
+		result = new DNumber(Math.random());
+		break;
 	      case '!':		// Yields DEmpty (Like Null in Java)
-	    break;
+		break;
 	      default:		// Yields variable value
 		if (varmap.containsKey(id)) result = varmap.get(id);
 	      }
