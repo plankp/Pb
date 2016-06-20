@@ -42,8 +42,11 @@ public class App
     
     StringBuilder tokenPatternsBuffer = new StringBuilder();
     for (TokenType tokenType : TokenType.values())
-      tokenPatternsBuffer.append(String.format("|(?<%s>%s)", tokenType.name(), tokenType.pattern));
-    Pattern tokenPatterns = Pattern.compile(new String(tokenPatternsBuffer.substring(1)));
+      tokenPatternsBuffer.append(String.format("|(?<%s>%s)",
+					       tokenType.name(),
+					       tokenType.pattern));
+    Pattern tokenPatterns = Pattern.compile
+      (new String(tokenPatternsBuffer.substring(1)));
     
     Matcher matcher = tokenPatterns.matcher(input);
     while (matcher.find())
@@ -57,56 +60,65 @@ public class App
 	
 	if (matcher.group(TokenType.NUMBER.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.NUMBER, matcher.group(TokenType.NUMBER.name())));
+	    tokens.add(new Token(TokenType.NUMBER,
+				 matcher.group(TokenType.NUMBER.name())));
 	  }
 	else if (matcher.group(TokenType.BINARYOP.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.BINARYOP, matcher.group(TokenType.BINARYOP.name())));
+	    tokens.add(new Token(TokenType.BINARYOP,
+				 matcher.group(TokenType.BINARYOP.name())));
 	  }
 	else if (matcher.group(TokenType.READ.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.READ, matcher.group(TokenType.READ.name())));
+	    tokens.add(new Token(TokenType.READ,
+				 matcher.group(TokenType.READ.name())));
 	  }
 	else if (matcher.group(TokenType.ASSIGN.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.ASSIGN, matcher.group(TokenType.ASSIGN.name())));
+	    tokens.add(new Token(TokenType.ASSIGN,
+				 matcher.group(TokenType.ASSIGN.name())));
 	  }
 	else if (matcher.group(TokenType.TEXT.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.TEXT, matcher.group(TokenType.TEXT.name())));
+	    tokens.add(new Token(TokenType.TEXT,
+				 matcher.group(TokenType.TEXT.name())));
 	  }
 	else if (matcher.group(TokenType.RTEXT.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.RTEXT, matcher.group(TokenType.RTEXT.name())));
+	    tokens.add(new Token(TokenType.RTEXT,
+				 matcher.group(TokenType.RTEXT.name())));
 	  }
 	else if (matcher.group(TokenType.LPAREN.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.LPAREN, matcher.group(TokenType.LPAREN.name())));
+	    tokens.add(new Token(TokenType.LPAREN,
+				 matcher.group(TokenType.LPAREN.name())));
 	  }
 	else if (matcher.group(TokenType.RPAREN.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.RPAREN, matcher.group(TokenType.RPAREN.name())));
+	    tokens.add(new Token(TokenType.RPAREN,
+				 matcher.group(TokenType.RPAREN.name())));
 	  }
 	else if (matcher.group(TokenType.LTUPLE.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.LTUPLE, matcher.group(TokenType.LTUPLE.name())));
+	    tokens.add(new Token(TokenType.LTUPLE,
+				 matcher.group(TokenType.LTUPLE.name())));
 	  }
 	else if (matcher.group(TokenType.RTUPLE.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.RTUPLE, matcher.group(TokenType.RTUPLE.name())));
+	    tokens.add(new Token(TokenType.RTUPLE,
+				 matcher.group(TokenType.RTUPLE.name())));
 	  }
 	else if (matcher.group(TokenType.LBLOCK.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.LBLOCK, matcher.group(TokenType.LBLOCK.name())));
+	    tokens.add(new Token(TokenType.LBLOCK,
+				 matcher.group(TokenType.LBLOCK.name())));
 	  }
 	else if (matcher.group(TokenType.RBLOCK.name()) != null)
 	  {
-	    tokens.add(new Token(TokenType.RBLOCK, matcher.group(TokenType.RBLOCK.name())));
+	    tokens.add(new Token(TokenType.RBLOCK,
+				 matcher.group(TokenType.RBLOCK.name())));
 	  }
-	else
-	  {
-	    throw new RuntimeException("Syntax error. Start:" + matcher.start() + " Text:" + matcher.group());
-	  }
+	else throw new LexerException(matcher);
       }
     
     return tokens;
@@ -126,210 +138,231 @@ public class App
 
   public static int visitStmt(int counter, final List<Token> toks)
   {
-    final Token tok = toks.get(counter);
-    if (tok.type == TokenType.ASSIGN)
+    try
       {
-	char id = tok.data.charAt(0);
-	Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
-	counter = tuple.getLeft();
-	final Data tmpd = tuple.getRight().copy();
-	
-	switch (id)
+	final Token tok = toks.get(counter);
+	if (tok.type == TokenType.ASSIGN)
 	  {
-	  case ' ':
-	    System.out.println(tmpd);
-	    break;
-	  case '!':
-	    throw new RuntimeException(tmpd.toString());
-	  default:
-	    varmap.put(id, tmpd);
+	    char id = tok.data.charAt(0);
+	    Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
+	    counter = tuple.getLeft();
+	    final Data tmpd = tuple.getRight().copy();
+	    
+	    switch (id)
+	      {
+	      case ' ':
+		System.out.println(tmpd);
+		break;
+	      case '!':
+		throw new RuntimeException(tmpd.toString());
+	      default:
+		varmap.put(id, tmpd);
+	      }
 	  }
+	else if (tok.type != TokenType.TEXT)
+	  {
+	    throw new ParserException(tok, "ASSIGN");
+	  }
+	else throw new ParserException(null, "ASSIGN", "TEXT");
+	return counter;
       }
-    else if (tok.type != TokenType.TEXT)
+    catch (IndexOutOfBoundsException ex)
       {
-	throw new RuntimeException("Expected ASSIGN. Found " + tok);
+	throw new ParserException(null, "ASSIGN", "TEXT");
       }
-    return counter;
   }
   
   public static Tuple<Integer, Data> visitValue(int counter,
 						final List<Token> toks)
   {
-    Data result = DEmpty.getInstance();
-    Token tok = toks.get(counter);
-    if (tok.type == TokenType.READ)
+    try
       {
-	char id = tok.data.charAt(1);
-	switch (id)
+	Data result = DEmpty.getInstance();
+	Token tok = toks.get(counter);
+	if (tok.type == TokenType.READ)
 	  {
-	  case ' ':		// Yields user input
-	    if (SYSIN.hasNextLine()) result = new DString(SYSIN.nextLine());
+	    char id = tok.data.charAt(1);
+	    switch (id)
+	      {
+	      case ' ':		// Yields user input
+		if (SYSIN.hasNextLine()) result = new DString(SYSIN.nextLine());
 	    else result = new DString("");
-	  case '!':		// Yields DEmpty (Like Null in Java)
+	      case '!':		// Yields DEmpty (Like Null in Java)
 	    break;
-	  default:		// Yields variable value
-	    if (varmap.containsKey(id)) result = varmap.get(id);
-	  }
-      }
-    else if (tok.type == TokenType.NUMBER)
-      {
-	String rawnum = tok.data;
-	if (rawnum.charAt(0) == '_') rawnum = "-" + rawnum.substring(1);
-	result = new DNumber(Double.parseDouble(rawnum));
-      }
-    else if (tok.type == TokenType.TEXT)
-      {
-	String rawstr = tok.data;
-	result = new DString(rawstr.substring(2));
-      }
-    else if (tok.type == TokenType.RTEXT)
-      {
-	String rawstr = tok.data;
-	int len = rawstr.length();
-
-	if (len == 4) result = new DString("");
-	else result = new DString(rawstr.substring(2, len - 2));
-      }
-    else if (tok.type == TokenType.LPAREN)
-      {
-	int bracketsBalance = 1;
-	List<Token> bracketsExpr = new ArrayList<>();
-	for (counter++; counter < toks.size(); counter++)
-	  {
-	    final Token brtok = toks.get(counter);
-	    if (brtok.type == TokenType.LPAREN) bracketsBalance++;
-	    else if (brtok.type == TokenType.RPAREN) bracketsBalance--;
-	    
-	    if (bracketsBalance == 0) break;
-	    bracketsExpr.add(brtok);
-	  }
-	Tuple<Integer, Data> expr = visitValue(0, bracketsExpr);
-	result = expr.getRight();
-      }
-    else if (tok.type == TokenType.LTUPLE)
-      {
-	int bracketsBalance = 1;
-	List<Token> bracketsExpr = new ArrayList<>();
-	for (counter++; counter < toks.size(); counter++)
-	  {
-	    final Token brtok = toks.get(counter);
-	    if (brtok.type == TokenType.LTUPLE) bracketsBalance++;
-	    else if (brtok.type == TokenType.RTUPLE) bracketsBalance--;
-	    
-	    if (bracketsBalance == 0) break;
-	    bracketsExpr.add(brtok);
-	  }
-	int oldCounter = -1;
-	int elmCounter = 0;
-
-	List<Data> tupleData = new ArrayList<>();
-	while (oldCounter != elmCounter)
-	  {
-	    try
-	      {
-		final Tuple<Integer, Data> expr =
-		  visitValue(elmCounter, bracketsExpr);
-		oldCounter = elmCounter;
-		elmCounter = expr.getLeft();
-		tupleData.add(expr.getRight().copy());
-	      }
-	    catch (RuntimeException ex)
-	      {
-		break;
+	      default:		// Yields variable value
+		if (varmap.containsKey(id)) result = varmap.get(id);
 	      }
 	  }
-	result = new DTuple(tupleData);
-      }
-    else if (tok.type == TokenType.LBLOCK)
-      {
-	int bracketsBalance = 1;
-	List<Token> bracketsExpr = new ArrayList<>();
-	for (counter++; counter < toks.size(); counter++)
+	else if (tok.type == TokenType.NUMBER)
 	  {
-	    final Token brtok = toks.get(counter);
-	    if (brtok.type == TokenType.LBLOCK) bracketsBalance++;
-	    else if (brtok.type == TokenType.RBLOCK) bracketsBalance--;
-	    
-	    if (bracketsBalance == 0) break;
-	    bracketsExpr.add(brtok);
+	    String rawnum = tok.data;
+	    if (rawnum.charAt(0) == '_') rawnum = "-" + rawnum.substring(1);
+	    result = new DNumber(Double.parseDouble(rawnum));
 	  }
-	int oldCounter = -1;
-	int elmCounter = 0;
-
-	boolean processed = false;
-        Boolean condition = null;
-	while (oldCounter != elmCounter)
+	else if (tok.type == TokenType.TEXT)
 	  {
-	    try
+	    String rawstr = tok.data;
+	    result = new DString(rawstr.substring(2));
+	  }
+	else if (tok.type == TokenType.RTEXT)
+	  {
+	    String rawstr = tok.data;
+	    int len = rawstr.length();
+
+	    if (len == 4) result = new DString("");
+	    else result = new DString(rawstr.substring(2, len - 2));
+	  }
+	else if (tok.type == TokenType.LPAREN)
+	  {
+	    int bracketsBalance = 1;
+	    List<Token> bracketsExpr = new ArrayList<>();
+	    for (counter++; counter < toks.size(); counter++)
 	      {
-		if (condition == null)
+		final Token brtok = toks.get(counter);
+		if (brtok.type == TokenType.LPAREN) bracketsBalance++;
+		else if (brtok.type == TokenType.RPAREN) bracketsBalance--;
+		
+		if (bracketsBalance == 0) break;
+		bracketsExpr.add(brtok);
+	      }
+	    Tuple<Integer, Data> expr = visitValue(0, bracketsExpr);
+	    result = expr.getRight();
+	  }
+	else if (tok.type == TokenType.LTUPLE)
+	  {
+	    int bracketsBalance = 1;
+	    List<Token> bracketsExpr = new ArrayList<>();
+	    for (counter++; counter < toks.size(); counter++)
+	      {
+		final Token brtok = toks.get(counter);
+		if (brtok.type == TokenType.LTUPLE) bracketsBalance++;
+		else if (brtok.type == TokenType.RTUPLE) bracketsBalance--;
+		
+		if (bracketsBalance == 0) break;
+		bracketsExpr.add(brtok);
+	      }
+	    int oldCounter = -1;
+	    int elmCounter = 0;
+
+	    List<Data> tupleData = new ArrayList<>();
+	    while (oldCounter != elmCounter)
+	      {
+		try
 		  {
 		    final Tuple<Integer, Data> expr =
 		      visitValue(elmCounter, bracketsExpr);
 		    oldCounter = elmCounter;
 		    elmCounter = expr.getLeft();
-		    Data tmp = expr.getRight();
-		    condition = tmp.isTruthy();
+		    tupleData.add(expr.getRight().copy());
 		  }
-	        else if (condition)
+		catch (ParserException ex)
 		  {
-		    processed = true;
-		    int tmp = visitStmt(elmCounter, bracketsExpr) - 1;
-		    oldCounter = elmCounter;
-		    elmCounter = tmp;
+		    break;
 		  }
-		else break;
 	      }
-	    catch (RuntimeException ex)
-	      {
-		processed = false;
-		break;
-	      }
+	    result = new DTuple(tupleData);
 	  }
-	result = new DBoolean(processed ? condition : !condition);
-      }
-    else
-      {
-	throw new RuntimeException("Expected READ or NUMBER. Found " + tok);
-      }
-    if (counter < toks.size() - 1)
-      {
-	tok = toks.get(++counter);
-	if (tok.type == TokenType.BINARYOP)
+	else if (tok.type == TokenType.LBLOCK)
 	  {
-	    final String op = tok.data;
-	    Data clone = result.copy();
-	    Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
-	    counter = tuple.getLeft();
-	    Data tmprst = tuple.getRight();
-	    result = clone;
-	    
-	    switch (op)
+	    int bracketsBalance = 1;
+	    List<Token> bracketsExpr = new ArrayList<>();
+	    for (counter++; counter < toks.size(); counter++)
 	      {
-	      case "+":
-		result = result.plus(tmprst);
-		break;
-	      case "-":
-		result = result.minus(tmprst);
-		break;
-	      case "*":
-		result = result.times(tmprst);
-		break;
-	      case "/":
-		result = result.divide(tmprst);
-		break;
-	      case "%":
-		result = result.modulo(tmprst);
-		break;
-	      case ":":
-		result = result.subscript(tmprst);
-		break;
+		final Token brtok = toks.get(counter);
+		if (brtok.type == TokenType.LBLOCK) bracketsBalance++;
+		else if (brtok.type == TokenType.RBLOCK) bracketsBalance--;
+		
+		if (bracketsBalance == 0) break;
+		bracketsExpr.add(brtok);
+	      }
+	    int oldCounter = -1;
+	    int elmCounter = 0;
+	    
+	    boolean processed = false;
+	    Boolean condition = null;
+	    while (oldCounter != elmCounter)
+	      {
+		try
+		  {
+		    if (condition == null)
+		      {
+			final Tuple<Integer, Data> expr =
+			  visitValue(elmCounter, bracketsExpr);
+			oldCounter = elmCounter;
+			elmCounter = expr.getLeft();
+			Data tmp = expr.getRight();
+			condition = tmp.isTruthy();
+		      }
+		    else if (condition)
+		      {
+			processed = true;
+			int tmp = visitStmt(elmCounter, bracketsExpr) - 1;
+			oldCounter = elmCounter;
+			elmCounter = tmp;
+		      }
+		    else break;
+		  }
+		catch (ParserException ex)
+		  {
+		    processed = false;
+		    break;
+		  }
+	      }
+	    if (condition == null)
+	      throw new ParserException(null, "rule value");
+	    result = new DBoolean(processed ? condition : !condition);
+	  }
+	else
+	  {
+	    throw new ParserException
+	      (tok,
+	       "READ", "NUMBER", "LTUPLE", "LBLOCK", "LPAREN", "TEXT", "RTEXT");
+	  }
+	if (counter < toks.size() - 1)
+	  {
+	    tok = toks.get(++counter);
+	    if (tok.type == TokenType.BINARYOP)
+	      {
+		final String op = tok.data;
+		Data clone = result.copy();
+		Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
+		counter = tuple.getLeft();
+		Data tmprst = tuple.getRight();
+		result = clone;
+		
+		switch (op)
+		  {
+		  case "+":
+		    result = result.plus(tmprst);
+		    break;
+		  case "-":
+		    result = result.minus(tmprst);
+		    break;
+		  case "*":
+		    result = result.times(tmprst);
+		    break;
+		  case "/":
+		    result = result.divide(tmprst);
+		    break;
+		  case "%":
+		    result = result.modulo(tmprst);
+		    break;
+		  case ":":
+		    result = result.subscript(tmprst);
+		    break;
+		  }
 	      }
 	  }
+	return new Tuple<>(counter, result);
       }
-    return new Tuple<>(counter, result);
+    catch (IndexOutOfBoundsException ex)
+      {
+	throw new ParserException
+	  (null,
+	   "READ", "NUMBER", "LTUPLE", "LBLOCK", "LPAREN", "TEXT", "RTEXT");
+      }
   }
-
+  
   static final Scanner SYSIN = new Scanner(System.in);
 
   public static void scanLine(Scanner scanner)
