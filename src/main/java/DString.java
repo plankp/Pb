@@ -125,4 +125,10 @@ public final class DString extends Data
   {
     return val;
   }
+
+  @Override
+  public boolean isTruthy()
+  {
+    return val.length() > 0;
+  }
 }

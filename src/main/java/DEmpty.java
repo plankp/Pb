@@ -89,4 +89,10 @@ public final class DEmpty extends Data
   {
     return "<EMPTY@" + hashCode() + ">";
   }
+
+  @Override
+  public boolean isTruthy()
+  {
+    return false;
+  }
 }

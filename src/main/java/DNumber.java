@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-public final class DNumber extends Data
+public class DNumber extends Data
 {
-  private double val;
+  protected double val;
 
   public DNumber(double d)
   {
@@ -169,5 +169,11 @@ public final class DNumber extends Data
   public String toString()
   {
     return String.valueOf(val);
+  }
+
+  @Override
+  public boolean isTruthy()
+  {
+    return val != 0 && !Double.isInfinite(val) && !Double.isNaN(val);
   }
 }

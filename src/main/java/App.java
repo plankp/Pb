@@ -95,6 +95,14 @@ public class App
 	  {
 	    tokens.add(new Token(TokenType.RTUPLE, matcher.group(TokenType.RTUPLE.name())));
 	  }
+	else if (matcher.group(TokenType.LBLOCK.name()) != null)
+	  {
+	    tokens.add(new Token(TokenType.LBLOCK, matcher.group(TokenType.LBLOCK.name())));
+	  }
+	else if (matcher.group(TokenType.RBLOCK.name()) != null)
+	  {
+	    tokens.add(new Token(TokenType.RBLOCK, matcher.group(TokenType.RBLOCK.name())));
+	  }
 	else
 	  {
 	    throw new RuntimeException("Syntax error. Start:" + matcher.start() + " Text:" + matcher.group());
@@ -112,30 +120,36 @@ public class App
     int counter = 0;
     while (counter < toks.size() - 1)
       {
-	final Token tok = toks.get(counter);
-	if (tok.type == TokenType.ASSIGN)
+	counter = visitStmt(counter, toks);
+      }
+  }
+
+  public static int visitStmt(int counter, final List<Token> toks)
+  {
+    final Token tok = toks.get(counter);
+    if (tok.type == TokenType.ASSIGN)
+      {
+	char id = tok.data.charAt(0);
+	Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
+	counter = tuple.getLeft();
+	final Data tmpd = tuple.getRight().copy();
+	
+	switch (id)
 	  {
-	    char id = tok.data.charAt(0);
-	    Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
-	    counter = tuple.getLeft();
-	    final Data tmpd = tuple.getRight().copy();
-	    
-	    switch (id)
-	      {
-	      case ' ':
-		System.out.println(tmpd);
-		break;
-	      case '!':
-	        throw new RuntimeException(tmpd.toString());
-	      default:
-		varmap.put(id, tmpd);
-	      }
-	  }
-	else if (tok.type != TokenType.TEXT)
-	  {
-	    throw new RuntimeException("Expected ASSIGN. Found " + tok);
+	  case ' ':
+	    System.out.println(tmpd);
+	    break;
+	  case '!':
+	    throw new RuntimeException(tmpd.toString());
+	  default:
+	    varmap.put(id, tmpd);
 	  }
       }
+    else if (tok.type != TokenType.TEXT)
+      {
+	throw new RuntimeException("Expected ASSIGN. Found " + tok);
+      }
+    return counter;
   }
   
   public static Tuple<Integer, Data> visitValue(int counter,
@@ -154,7 +168,7 @@ public class App
 	  case '!':		// Yields DEmpty (Like Null in Java)
 	    break;
 	  default:		// Yields variable value
-	    result = varmap.get(id);
+	    if (varmap.containsKey(id)) result = varmap.get(id);
 	  }
       }
     else if (tok.type == TokenType.NUMBER)
@@ -211,13 +225,68 @@ public class App
 	List<Data> tupleData = new ArrayList<>();
 	while (oldCounter != elmCounter)
 	  {
-	    final Tuple<Integer, Data> expr =
-	      visitValue(elmCounter, bracketsExpr);
-	    oldCounter = elmCounter;
-	    elmCounter = expr.getLeft();
-	    tupleData.add(expr.getRight().copy());
+	    try
+	      {
+		final Tuple<Integer, Data> expr =
+		  visitValue(elmCounter, bracketsExpr);
+		oldCounter = elmCounter;
+		elmCounter = expr.getLeft();
+		tupleData.add(expr.getRight().copy());
+	      }
+	    catch (RuntimeException ex)
+	      {
+		break;
+	      }
 	  }
 	result = new DTuple(tupleData);
+      }
+    else if (tok.type == TokenType.LBLOCK)
+      {
+	int bracketsBalance = 1;
+	List<Token> bracketsExpr = new ArrayList<>();
+	for (counter++; counter < toks.size(); counter++)
+	  {
+	    final Token brtok = toks.get(counter);
+	    if (brtok.type == TokenType.LBLOCK) bracketsBalance++;
+	    else if (brtok.type == TokenType.RBLOCK) bracketsBalance--;
+	    
+	    if (bracketsBalance == 0) break;
+	    bracketsExpr.add(brtok);
+	  }
+	int oldCounter = -1;
+	int elmCounter = 0;
+
+	boolean processed = false;
+        Boolean condition = null;
+	while (oldCounter != elmCounter)
+	  {
+	    try
+	      {
+		if (condition == null)
+		  {
+		    final Tuple<Integer, Data> expr =
+		      visitValue(elmCounter, bracketsExpr);
+		    oldCounter = elmCounter;
+		    elmCounter = expr.getLeft();
+		    Data tmp = expr.getRight();
+		    condition = tmp.isTruthy();
+		  }
+	        else if (condition)
+		  {
+		    processed = true;
+		    int tmp = visitStmt(elmCounter, bracketsExpr) - 1;
+		    oldCounter = elmCounter;
+		    elmCounter = tmp;
+		  }
+		else break;
+	      }
+	    catch (RuntimeException ex)
+	      {
+		processed = false;
+		break;
+	      }
+	  }
+	result = new DBoolean(processed ? condition : !condition);
       }
     else
       {

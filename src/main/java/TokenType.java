@@ -36,6 +36,8 @@ public enum TokenType
   RPAREN("\\)"),
   LTUPLE("\\{"),
   RTUPLE("\\}"),
+  LBLOCK("\\["),
+  RBLOCK("\\]"),
   COMMENT(".");	   // Ok... Anything we don't care is a comment right?
     
   public final String pattern;

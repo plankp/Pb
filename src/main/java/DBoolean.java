@@ -22,25 +22,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import java.io.Serializable;
-
-public abstract class Data implements Serializable
+public final class DBoolean extends DNumber
 {
-  private final long serialVersionUID = -128348263L;
+  public DBoolean(boolean b)
+  {
+    super(b ? 1 : 0);
+  }
 
-  public abstract Data plus(Data d);
+  @Override
+  public String toString()
+  {
+    return String.valueOf(val == 0);
+  }
 
-  public abstract Data minus(Data d);
-
-  public abstract Data times(Data d);
-
-  public abstract Data divide(Data d);
-
-  public abstract Data modulo(Data d);
-
-  public abstract Data subscript(Data d);
-
-  public abstract boolean isTruthy();
-
-  public abstract Data copy();
+  @Override
+  public boolean isTruthy()
+  {
+    return val != 0;
+  }
 }

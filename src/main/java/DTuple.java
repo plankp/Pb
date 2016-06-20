@@ -117,4 +117,10 @@ public final class DTuple extends Data
     sb.setCharAt(sb.length() - 1, '}');
     return sb.toString();
   }
+
+  @Override
+  public boolean isTruthy()
+  {
+    return !data.isEmpty();
+  }
 }
