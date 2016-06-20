@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.Map;
 import java.util.List;
 import java.util.Scanner;
@@ -5,6 +6,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.io.FileNotFoundException;
 
 public class App
 {
@@ -224,18 +226,39 @@ public class App
   }
 
   static final Scanner SYSIN = new Scanner(System.in);
+
+  public static void scanLine(Scanner scanner)
+  {
+    String instr = scanner.nextLine();
+    List<Token> tokens = lex(instr);
+    parse(tokens);
+  }
   
   public static void main(String[] args)
   {
+    if (args.length == 1)
+      {
+	File src = new File(args[0]);
+	try
+	  {
+	    Scanner stream = new Scanner(src);
+	    if (stream.hasNextLine())
+	      {
+		do scanLine(stream);
+		while (stream.hasNextLine());
+	      }
+	    else System.out.println("Hello, world!");
+	  }
+	catch (FileNotFoundException ex)
+	  {
+	    System.out.println("File " + args[0] + " cannot be found");
+	  }
+	return;
+      }
     while (true)
       {
 	System.out.print(">> ");
-	if (SYSIN.hasNextLine())
-	  {
-	    String instr = SYSIN.nextLine();
-	    List<Token> tokens = lex(instr);
-	    parse(tokens);
-	  }
+	if (SYSIN.hasNextLine()) scanLine(SYSIN);
 	else break;
       }
   }
