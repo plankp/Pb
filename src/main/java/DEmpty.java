@@ -83,4 +83,10 @@ public final class DEmpty extends Data
   {
     return instance;
   }
+
+  @Override
+  public String toString()
+  {
+    return "<EMPTY@" + hashCode() + ">";
+  }
 }

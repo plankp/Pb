@@ -120,8 +120,16 @@ public class App
 	    counter = tuple.getLeft();
 	    final Data tmpd = tuple.getRight().copy();
 	    
-	    if (id == ' ') System.out.println(tmpd);
-	    else varmap.put(id, tmpd);
+	    switch (id)
+	      {
+	      case ' ':
+		System.out.println(tmpd);
+		break;
+	      case '!':
+	        throw new RuntimeException(tmpd.toString());
+	      default:
+		varmap.put(id, tmpd);
+	      }
 	  }
 	else if (tok.type != TokenType.TEXT)
 	  {
@@ -138,12 +146,16 @@ public class App
     if (tok.type == TokenType.READ)
       {
 	char id = tok.data.charAt(1);
-	if (id == ' ')
+	switch (id)
 	  {
+	  case ' ':		// Yields user input
 	    if (SYSIN.hasNextLine()) result = new DString(SYSIN.nextLine());
-	    // otherwise, result stores an empty string
+	    else result = new DString("");
+	  case '!':		// Yields DEmpty (Like Null in Java)
+	    break;
+	  default:		// Yields variable value
+	    result = varmap.get(id);
 	  }
-	else result = varmap.get(id);
       }
     else if (tok.type == TokenType.NUMBER)
       {
