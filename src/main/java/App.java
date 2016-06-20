@@ -97,7 +97,7 @@ public class App
 	    if (id == ' ') System.out.println(tmpd);
 	    else varmap.put(id, tmpd);
 	  }
-	else
+	else if (tok.type != TokenType.TEXT)
 	  {
 	    throw new RuntimeException("Expected ASSIGN. Found " + tok);
 	  }
