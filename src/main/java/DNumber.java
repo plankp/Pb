@@ -121,7 +121,10 @@ public class DNumber extends Data
   {
     if (d instanceof DNumber)
       {
-	val = ((int) val) % ((int) ((DNumber) d).val);
+	int rightSide = (int) val;
+	int leftSide = (int) ((DNumber) d).val;
+	if (leftSide == 0) val = rightSide;
+	else val = rightSide % leftSide;
 	return this;
       }
     else if (d instanceof DTuple)
@@ -175,5 +178,27 @@ public class DNumber extends Data
   public boolean isTruthy()
   {
     return val != 0 && !Double.isInfinite(val) && !Double.isNaN(val);
+  }
+
+  @Override
+  public DBoolean lessThan(Data d)
+  {
+    if (d instanceof DNumber)
+      {
+	return new DBoolean(val < ((DNumber) d).val);
+      }
+    throw new RuntimeException("Cannot apply DNumber < " +
+			       d.getClass().getSimpleName());
+  }
+
+  @Override
+  public DBoolean moreThan(Data d)
+  {
+    if (d instanceof DNumber)
+      {
+	return new DBoolean(val > ((DNumber) d).val);
+      }
+    throw new RuntimeException("Cannot apply DNumber > " +
+			       d.getClass().getSimpleName());
   }
 }

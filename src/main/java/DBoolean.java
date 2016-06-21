@@ -40,4 +40,10 @@ public final class DBoolean extends DNumber
   {
     return val != 0;
   }
+
+  public DBoolean not()
+  {
+    val = val != 0 ? 0 : 1;
+    return this;
+  }
 }

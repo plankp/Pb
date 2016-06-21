@@ -24,18 +24,21 @@ SOFTWARE.
 
 public class Token
 {  
-  public TokenType type;
-  
-  public String data;
-  
-  public Token(TokenType type, String data)
+  public final TokenType type;
+  public final String data;
+  public final int start;
+  public final int end;
+
+  public Token(TokenType type, String data, int start, int end)
   {
     this.type = type;
     this.data = data;
+    this.start = start;
+    this.end = end;
   }
   
   @Override
   public String toString() {
-    return String.format("(%s %s)", type.name(), data);
+    return String.format("[(%s %s)(%d %d)]", type.name(), data, start, end);
   }
 }

@@ -25,7 +25,7 @@ SOFTWARE.
 import java.util.List;
 import java.util.ArrayList;
 
-public final class DString extends Data
+public final class DString extends Data implements ISizable
 {
   private String val;
 
@@ -130,5 +130,33 @@ public final class DString extends Data
   public boolean isTruthy()
   {
     return val.length() > 0;
+  }
+
+  @Override
+  public int getSize()
+  {
+    return val.length();
+  }
+  
+  @Override
+  public DBoolean lessThan(Data d)
+  {
+    if (d instanceof ISizable)
+      {
+	return new DBoolean(val.length() < ((ISizable) d).getSize());
+      }
+    throw new RuntimeException("Cannot apply DString < "
+			       + d.getClass().getSimpleName());
+  }
+
+  @Override
+  public DBoolean moreThan(Data d)
+  {
+    if (d instanceof ISizable)
+      {
+	return new DBoolean(val.length() > ((ISizable) d).getSize());
+      }
+    throw new RuntimeException("Cannot apply DString > "
+			       + d.getClass().getSimpleName());
   }
 }

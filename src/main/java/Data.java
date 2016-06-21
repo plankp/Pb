@@ -40,6 +40,10 @@ public abstract class Data implements Serializable
 
   public abstract Data subscript(Data d);
 
+  public abstract DBoolean lessThan(Data d);
+
+  public abstract DBoolean moreThan(Data d);
+
   public abstract boolean isTruthy();
 
   public abstract Data copy();

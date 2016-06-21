@@ -95,4 +95,16 @@ public final class DEmpty extends Data
   {
     return false;
   }
+
+  @Override
+  public DBoolean lessThan(Data d)
+  {
+    throw new RuntimeException("Cannot apply Empty < Data");
+  }
+
+  @Override
+  public DBoolean moreThan(Data d)
+  {
+    throw new RuntimeException("Cannot apply Empty > Data");
+  }
 }

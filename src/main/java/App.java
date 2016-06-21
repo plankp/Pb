@@ -61,62 +61,100 @@ public class App
 	if (matcher.group(TokenType.NUMBER.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.NUMBER,
-				 matcher.group(TokenType.NUMBER.name())));
+				 matcher.group(TokenType.NUMBER.name()),
+				 matcher.start(),
+				 matcher.end()));
+	  }
+	else if (matcher.group(TokenType.REDO.name()) != null)
+	  {
+	    tokens.add(new Token(TokenType.REDO,
+				 matcher.group(TokenType.REDO.name()),
+				 matcher.start(),
+				 matcher.end()));
+	  }
+	else if (matcher.group(TokenType.SKIP.name()) != null)
+	  {
+	    tokens.add(new Token(TokenType.SKIP,
+				 matcher.group(TokenType.SKIP.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.BINARYOP.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.BINARYOP,
-				 matcher.group(TokenType.BINARYOP.name())));
+				 matcher.group(TokenType.BINARYOP.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.READ.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.READ,
-				 matcher.group(TokenType.READ.name())));
+				 matcher.group(TokenType.READ.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.ASSIGN.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.ASSIGN,
-				 matcher.group(TokenType.ASSIGN.name())));
+				 matcher.group(TokenType.ASSIGN.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.TEXT.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.TEXT,
-				 matcher.group(TokenType.TEXT.name())));
+				 matcher.group(TokenType.TEXT.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.RTEXT.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.RTEXT,
-				 matcher.group(TokenType.RTEXT.name())));
+				 matcher.group(TokenType.RTEXT.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.LPAREN.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.LPAREN,
-				 matcher.group(TokenType.LPAREN.name())));
+				 matcher.group(TokenType.LPAREN.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.RPAREN.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.RPAREN,
-				 matcher.group(TokenType.RPAREN.name())));
+				 matcher.group(TokenType.RPAREN.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.LTUPLE.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.LTUPLE,
-				 matcher.group(TokenType.LTUPLE.name())));
+				 matcher.group(TokenType.LTUPLE.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.RTUPLE.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.RTUPLE,
-				 matcher.group(TokenType.RTUPLE.name())));
+				 matcher.group(TokenType.RTUPLE.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.LBLOCK.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.LBLOCK,
-				 matcher.group(TokenType.LBLOCK.name())));
+				 matcher.group(TokenType.LBLOCK.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else if (matcher.group(TokenType.RBLOCK.name()) != null)
 	  {
 	    tokens.add(new Token(TokenType.RBLOCK,
-				 matcher.group(TokenType.RBLOCK.name())));
+				 matcher.group(TokenType.RBLOCK.name()),
+				 matcher.start(),
+				 matcher.end()));
 	  }
 	else throw new LexerException(matcher);
       }
@@ -138,6 +176,7 @@ public class App
 
   public static int visitStmt(int counter, final List<Token> toks)
   {
+    int oldCounter = counter;
     try
       {
 	final Token tok = toks.get(counter);
@@ -163,11 +202,30 @@ public class App
 		varmap.put(id, tmpd);
 	      }
 	  }
-	else if (tok.type != TokenType.TEXT)
+	else if (tok.type == TokenType.TEXT)
 	  {
-	    throw new ParserException(tok, "ASSIGN");
+	    // These can be directives?
 	  }
-	else throw new ParserException(null, "ASSIGN", "TEXT");
+	else
+	  {
+	    throw new ParserException(tok, "ASSIGN", "TEXT");
+	  }
+	try
+	  {
+	    Token postAct = toks.get(counter++);
+	    if (postAct.type == TokenType.REDO)
+	      {
+		visitStmt(oldCounter, toks);
+	      }
+	    else if (postAct.type == TokenType.SKIP)
+	      {
+		counter++;
+	      }
+	    else counter--;
+	  }
+	catch (IndexOutOfBoundsException ex)
+	  {
+	  }
 	return counter;
       }
     catch (IndexOutOfBoundsException ex)
@@ -365,6 +423,12 @@ public class App
 		  case ":":
 		    result = result.subscript(tmprst);
 		    break;
+		  case "<":
+		    result = result.lessThan(tmprst);
+		    break;
+		  case ">":
+		    result = result.moreThan(tmprst);
+		    break;
 		  }
 	      }
 	  }
@@ -386,26 +450,31 @@ public class App
     List<Token> tokens = lex(instr);
     parse(tokens);
   }
+
+  public static void readFile(String path)
+  {
+    File src = new File(path);
+    try
+      {
+	Scanner stream = new Scanner(src);
+	if (stream.hasNextLine())
+	  {
+	    do scanLine(stream);
+	    while (stream.hasNextLine());
+	  }
+	else System.out.println("Hello, world!");
+      }
+    catch (FileNotFoundException ex)
+      {
+	System.out.println("File " + path + " cannot be found");
+      }
+  }
   
   public static void main(String[] args)
   {
     if (args.length == 1)
       {
-	File src = new File(args[0]);
-	try
-	  {
-	    Scanner stream = new Scanner(src);
-	    if (stream.hasNextLine())
-	      {
-		do scanLine(stream);
-		while (stream.hasNextLine());
-	      }
-	    else System.out.println("Hello, world!");
-	  }
-	catch (FileNotFoundException ex)
-	  {
-	    System.out.println("File " + args[0] + " cannot be found");
-	  }
+	readFile(args[0]);
 	return;
       }
     while (true)

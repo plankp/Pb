@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 
-public final class DTuple extends Data
+public final class DTuple extends Data implements ISizable
 {
   public final List<Data> data;
 
@@ -122,5 +122,33 @@ public final class DTuple extends Data
   public boolean isTruthy()
   {
     return !data.isEmpty();
+  }
+  
+  @Override
+  public int getSize()
+  {
+    return data.size();
+  }
+  
+  @Override
+  public DBoolean lessThan(Data d)
+  {
+    if (d instanceof ISizable)
+      {
+	return new DBoolean(data.size() < ((ISizable) d).getSize());
+      }
+    throw new RuntimeException("Cannot apply DTuple < "
+			       + d.getClass().getSimpleName());
+  }
+
+  @Override
+  public DBoolean moreThan(Data d)
+  {
+    if (d instanceof ISizable)
+      {
+	return new DBoolean(data.size() > ((ISizable) d).getSize());
+      }
+    throw new RuntimeException("Cannot apply DTuple > "
+			       + d.getClass().getSimpleName());
   }
 }
