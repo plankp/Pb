@@ -159,4 +159,14 @@ public final class DString extends Data implements ISizable
     throw new RuntimeException("Cannot apply DString > "
 			       + d.getClass().getSimpleName());
   }
+
+  @Override
+  public boolean equals(Object d)
+  {
+    if (d instanceof DString)
+      {
+	return val.equals(((DString) d).val);
+      }
+    return false;
+  }
 }

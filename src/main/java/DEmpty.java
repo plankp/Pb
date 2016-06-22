@@ -107,4 +107,11 @@ public final class DEmpty extends Data
   {
     throw new RuntimeException("Cannot apply Empty > Data");
   }
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (o instanceof DEmpty) return true;
+    return false;
+  }
 }

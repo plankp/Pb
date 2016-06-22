@@ -201,4 +201,14 @@ public class DNumber extends Data
     throw new RuntimeException("Cannot apply DNumber > " +
 			       d.getClass().getSimpleName());
   }
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (o instanceof DNumber)
+      {
+	return val == ((DNumber) o).val;
+      }
+    return false;
+  }
 }

@@ -109,6 +109,8 @@ public final class DTuple extends Data implements ISizable
   @Override
   public String toString()
   {
+    if (data.isEmpty()) return "{}";
+
     StringBuilder sb = new StringBuilder("{");
     for (Data el : data)
       {
@@ -150,5 +152,15 @@ public final class DTuple extends Data implements ISizable
       }
     throw new RuntimeException("Cannot apply DTuple > "
 			       + d.getClass().getSimpleName());
+  }
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (o instanceof DTuple)
+      {
+	return data.equals(((DTuple) o).data);
+      }
+    return false;
   }
 }

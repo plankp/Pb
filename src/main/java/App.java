@@ -1,487 +1,375 @@
 /*
-The MIT License (MIT)
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2016 Plankp T.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-Copyright (c) 2016 Plankp T.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
-import java.io.File;
 import java.util.Map;
 import java.util.List;
-import java.util.Scanner;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.io.FileNotFoundException;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 public class App
 {
-  private final static Map<Character, Data> varmap = new HashMap<>();
-  
-  public static List<Token> lex(String input)
-  {
-    List<Token> tokens = new ArrayList<>();
-    
-    StringBuilder tokenPatternsBuffer = new StringBuilder();
-    for (TokenType tokenType : TokenType.values())
-      tokenPatternsBuffer.append(String.format("|(?<%s>%s)",
-					       tokenType.name(),
-					       tokenType.pattern));
-    Pattern tokenPatterns = Pattern.compile
-      (new String(tokenPatternsBuffer.substring(1)));
-    
-    Matcher matcher = tokenPatterns.matcher(input);
-    while (matcher.find())
-      {
-	if (matcher.group(TokenType.COMMENT.name()) != null
-	    || matcher.group(TokenType.WHITESPACE.name()) != null)
-	  {
-	    // -> HIDDEN
-	    continue;
-	  }
-	
-	if (matcher.group(TokenType.NUMBER.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.NUMBER,
-				 matcher.group(TokenType.NUMBER.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.REDO.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.REDO,
-				 matcher.group(TokenType.REDO.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.SKIP.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.SKIP,
-				 matcher.group(TokenType.SKIP.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.BINARYOP.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.BINARYOP,
-				 matcher.group(TokenType.BINARYOP.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.READ.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.READ,
-				 matcher.group(TokenType.READ.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.ASSIGN.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.ASSIGN,
-				 matcher.group(TokenType.ASSIGN.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.TEXT.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.TEXT,
-				 matcher.group(TokenType.TEXT.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.RTEXT.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.RTEXT,
-				 matcher.group(TokenType.RTEXT.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.LPAREN.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.LPAREN,
-				 matcher.group(TokenType.LPAREN.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.RPAREN.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.RPAREN,
-				 matcher.group(TokenType.RPAREN.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.LTUPLE.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.LTUPLE,
-				 matcher.group(TokenType.LTUPLE.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.RTUPLE.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.RTUPLE,
-				 matcher.group(TokenType.RTUPLE.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.LBLOCK.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.LBLOCK,
-				 matcher.group(TokenType.LBLOCK.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else if (matcher.group(TokenType.RBLOCK.name()) != null)
-	  {
-	    tokens.add(new Token(TokenType.RBLOCK,
-				 matcher.group(TokenType.RBLOCK.name()),
-				 matcher.start(),
-				 matcher.end()));
-	  }
-	else throw new LexerException(matcher);
-      }
-    
-    return tokens;
-  }
-  
-  public static void parse(final List<Token> toks)
-  {
-    final int toksSize = toks.size();
-    if (toksSize == 0) return;
-    
-    int counter = 0;
-    while (counter < toks.size() - 1)
-      {
-	counter = visitStmt(counter, toks);
-      }
-  }
-
-  public static int visitStmt(int counter, final List<Token> toks)
-  {
-    int oldCounter = counter;
-    try
-      {
-	final Token tok = toks.get(counter);
-	if (tok.type == TokenType.ASSIGN)
-	  {
-	    char id = tok.data.charAt(0);
-	    Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
-	    counter = tuple.getLeft();
-	    final Data tmpd = tuple.getRight().copy();
-	    
-	    switch (id)
-	      {
-	      case ' ':
-		System.out.println(tmpd);
-		break;
-	      case '\t':
-		System.err.println(tmpd);
-	      case '_':
-		break;
-	      case '!':
-		throw new RuntimeException(tmpd.toString());
-	      default:
-		varmap.put(id, tmpd);
-	      }
-	  }
-	else if (tok.type == TokenType.TEXT)
-	  {
-	    // These can be directives?
-	  }
-	else
-	  {
-	    throw new ParserException(tok, "ASSIGN", "TEXT");
-	  }
-	try
-	  {
-	    Token postAct = toks.get(counter++);
-	    if (postAct.type == TokenType.REDO)
-	      {
-		visitStmt(oldCounter, toks);
-	      }
-	    else if (postAct.type == TokenType.SKIP)
-	      {
-		counter++;
-	      }
-	    else counter--;
-	  }
-	catch (IndexOutOfBoundsException ex)
-	  {
-	  }
-	return counter;
-      }
-    catch (IndexOutOfBoundsException ex)
-      {
-	throw new ParserException(null, "ASSIGN", "TEXT");
-      }
-  }
-  
-  public static Tuple<Integer, Data> visitValue(int counter,
-						final List<Token> toks)
-  {
-    try
-      {
-	Data result = DEmpty.getInstance();
-	Token tok = toks.get(counter);
-	if (tok.type == TokenType.READ)
-	  {
-	    char id = tok.data.charAt(1);
-	    switch (id)
-	      {
-	      case ' ':		// Yields user input
-		if (SYSIN.hasNextLine()) result = new DString(SYSIN.nextLine());
-		else result = new DString("");
-		break;
-	      case '\t':
-		if (SYSIN.hasNextDouble())
-		  {
-		    result = new DNumber(SYSIN.nextDouble());
-		  }
-		else result = new DNumber(0);
-		break;
-	      case '_':
-		result = new DNumber(Math.random());
-		break;
-	      case '!':		// Yields DEmpty (Like Null in Java)
-		break;
-	      default:		// Yields variable value
-		if (varmap.containsKey(id)) result = varmap.get(id);
-	      }
-	  }
-	else if (tok.type == TokenType.NUMBER)
-	  {
-	    String rawnum = tok.data;
-	    if (rawnum.charAt(0) == '_') rawnum = "-" + rawnum.substring(1);
-	    result = new DNumber(Double.parseDouble(rawnum));
-	  }
-	else if (tok.type == TokenType.TEXT)
-	  {
-	    String rawstr = tok.data;
-	    result = new DString(rawstr.substring(2));
-	  }
-	else if (tok.type == TokenType.RTEXT)
-	  {
-	    String rawstr = tok.data;
-	    int len = rawstr.length();
-
-	    if (len == 4) result = new DString("");
-	    else result = new DString(rawstr.substring(2, len - 2));
-	  }
-	else if (tok.type == TokenType.LPAREN)
-	  {
-	    int bracketsBalance = 1;
-	    List<Token> bracketsExpr = new ArrayList<>();
-	    for (counter++; counter < toks.size(); counter++)
-	      {
-		final Token brtok = toks.get(counter);
-		if (brtok.type == TokenType.LPAREN) bracketsBalance++;
-		else if (brtok.type == TokenType.RPAREN) bracketsBalance--;
-		
-		if (bracketsBalance == 0) break;
-		bracketsExpr.add(brtok);
-	      }
-	    Tuple<Integer, Data> expr = visitValue(0, bracketsExpr);
-	    result = expr.getRight();
-	  }
-	else if (tok.type == TokenType.LTUPLE)
-	  {
-	    int bracketsBalance = 1;
-	    List<Token> bracketsExpr = new ArrayList<>();
-	    for (counter++; counter < toks.size(); counter++)
-	      {
-		final Token brtok = toks.get(counter);
-		if (brtok.type == TokenType.LTUPLE) bracketsBalance++;
-		else if (brtok.type == TokenType.RTUPLE) bracketsBalance--;
-		
-		if (bracketsBalance == 0) break;
-		bracketsExpr.add(brtok);
-	      }
-	    int oldCounter = -1;
-	    int elmCounter = 0;
-
-	    List<Data> tupleData = new ArrayList<>();
-	    while (oldCounter != elmCounter)
-	      {
-		try
-		  {
-		    final Tuple<Integer, Data> expr =
-		      visitValue(elmCounter, bracketsExpr);
-		    oldCounter = elmCounter;
-		    elmCounter = expr.getLeft();
-		    tupleData.add(expr.getRight().copy());
-		  }
-		catch (ParserException ex)
-		  {
-		    break;
-		  }
-	      }
-	    result = new DTuple(tupleData);
-	  }
-	else if (tok.type == TokenType.LBLOCK)
-	  {
-	    int bracketsBalance = 1;
-	    List<Token> bracketsExpr = new ArrayList<>();
-	    for (counter++; counter < toks.size(); counter++)
-	      {
-		final Token brtok = toks.get(counter);
-		if (brtok.type == TokenType.LBLOCK) bracketsBalance++;
-		else if (brtok.type == TokenType.RBLOCK) bracketsBalance--;
-		
-		if (bracketsBalance == 0) break;
-		bracketsExpr.add(brtok);
-	      }
-	    int oldCounter = -1;
-	    int elmCounter = 0;
-	    
-	    boolean processed = false;
-	    Boolean condition = null;
-	    while (oldCounter != elmCounter)
-	      {
-		try
-		  {
-		    if (condition == null)
-		      {
-			final Tuple<Integer, Data> expr =
-			  visitValue(elmCounter, bracketsExpr);
-			oldCounter = elmCounter;
-			elmCounter = expr.getLeft();
-			Data tmp = expr.getRight();
-			condition = tmp.isTruthy();
-		      }
-		    else if (condition)
-		      {
-			processed = true;
-			int tmp = visitStmt(elmCounter, bracketsExpr) - 1;
-			oldCounter = elmCounter;
-			elmCounter = tmp;
-		      }
-		    else break;
-		  }
-		catch (ParserException ex)
-		  {
-		    processed = false;
-		    break;
-		  }
-	      }
-	    if (condition == null)
-	      throw new ParserException(null, "rule value");
-	    result = new DBoolean(processed ? condition : !condition);
-	  }
-	else
-	  {
-	    throw new ParserException
-	      (tok,
-	       "READ", "NUMBER", "LTUPLE", "LBLOCK", "LPAREN", "TEXT", "RTEXT");
-	  }
-	if (counter < toks.size() - 1)
-	  {
-	    tok = toks.get(++counter);
-	    if (tok.type == TokenType.BINARYOP)
-	      {
-		final String op = tok.data;
-		Data clone = result.copy();
-		Tuple<Integer, Data> tuple = visitValue(counter + 1, toks);
-		counter = tuple.getLeft();
-		Data tmprst = tuple.getRight();
-		result = clone;
-		
-		switch (op)
-		  {
-		  case "+":
-		    result = result.plus(tmprst);
-		    break;
-		  case "-":
-		    result = result.minus(tmprst);
-		    break;
-		  case "*":
-		    result = result.times(tmprst);
-		    break;
-		  case "/":
-		    result = result.divide(tmprst);
-		    break;
-		  case "%":
-		    result = result.modulo(tmprst);
-		    break;
-		  case ":":
-		    result = result.subscript(tmprst);
-		    break;
-		  case "<":
-		    result = result.lessThan(tmprst);
-		    break;
-		  case ">":
-		    result = result.moreThan(tmprst);
-		    break;
-		  }
-	      }
-	  }
-	return new Tuple<>(counter, result);
-      }
-    catch (IndexOutOfBoundsException ex)
-      {
-	throw new ParserException
-	  (null,
-	   "READ", "NUMBER", "LTUPLE", "LBLOCK", "LPAREN", "TEXT", "RTEXT");
-      }
-  }
-  
-  static final Scanner SYSIN = new Scanner(System.in);
-
-  public static void scanLine(Scanner scanner)
-  {
-    String instr = scanner.nextLine();
-    List<Token> tokens = lex(instr);
-    parse(tokens);
-  }
-
-  public static void readFile(String path)
-  {
-    File src = new File(path);
-    try
-      {
-	Scanner stream = new Scanner(src);
-	if (stream.hasNextLine())
-	  {
-	    do scanLine(stream);
-	    while (stream.hasNextLine());
-	  }
-	else System.out.println("Hello, world!");
-      }
-    catch (FileNotFoundException ex)
-      {
-	System.out.println("File " + path + " cannot be found");
-      }
-  }
-  
   public static void main(String[] args)
   {
-    if (args.length == 1)
+    try
       {
-	readFile(args[0]);
-	return;
+	ANTLRInputStream ins = new ANTLRFileStream(args[0]);
+	PBGrammarLexer lexer = new PBGrammarLexer(ins);
+	TokenStream tokens = new CommonTokenStream(lexer);
+	PBGrammarParser parser = new PBGrammarParser(tokens);
+	new PBImplVisitor().visit(parser.prog());
       }
-    while (true)
+    catch (java.io.IOException ex)
       {
-	System.out.print(">> ");
-	if (SYSIN.hasNextLine()) scanLine(SYSIN);
-	else break;
+	System.out.println("Exception when reading file " + args[0]);
       }
   }
 }
+
+class PBImplVisitor extends PBGrammarBaseVisitor<Data>
+{
+  private final Map<Character, Data> varmap = new HashMap<>();
+
+  private final Map<String, Data> definemap = new HashMap<>();
+
+  private static final Scanner SYSIN = new Scanner(System.in);
+
+  @Override
+  public Data visitProg(PBGrammarParser.ProgContext ctx)
+  {
+    for (int i = 0; i < ctx.getChildCount(); i++)
+      {
+	visit(ctx.getChild(i));  
+      }
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitDoWhile(PBGrammarParser.DoWhileContext ctx)
+  {
+    do
+      {
+	visit(ctx.getChild(0));
+      }
+    while (visit(ctx.getChild(2)).isTruthy());
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitWhileDo(PBGrammarParser.WhileDoContext ctx)
+  {
+    while (visit(ctx.getChild(1)).isTruthy())
+      {
+	visit(ctx.getChild(2));
+      }
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitDirective(PBGrammarParser.DirectiveContext ctx)
+  {
+    return DEmpty.getInstance();
+  }
+
+  private final Map<String, List<PBGrammarParser.StmtContext>> macromap =
+    new HashMap<>();
+
+  @Override
+  public Data visitDirMacro(PBGrammarParser.DirMacroContext ctx)
+  {
+    List<PBGrammarParser.StmtContext> stmts = new ArrayList<>();
+    for (int i = 2; i < ctx.getChildCount() - 1; i++)
+      {
+	stmts.add((PBGrammarParser.StmtContext) ctx.getChild(i));
+      }
+    macromap.put(ctx.getChild(1).getText(), stmts);
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitDirCall(PBGrammarParser.DirCallContext ctx)
+  {
+    String name = ctx.getChild(1).getText();
+    List<PBGrammarParser.StmtContext> stmts = macromap.get(name);
+    for (PBGrammarParser.StmtContext stmt : stmts)
+      {
+	visit(stmt);
+      }
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitDirDef(PBGrammarParser.DirDefContext ctx)
+  {
+    Data val = visit(ctx.getChild(2));
+    definemap.put(ctx.getChild(1).getText(), val);
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitDirUndef(PBGrammarParser.DirUndefContext ctx)
+  {
+    definemap.remove(ctx.getChild(1).getText());
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitDirIfdef(PBGrammarParser.DirIfdefContext ctx)
+  {
+    Data rst = visit(ctx.getChild(0));
+    if (!rst.isTruthy())
+      {
+	if (ctx.r != null) rst = visit(ctx.r);
+      }
+    if (!rst.isTruthy())
+      {
+	if (ctx.f != null) visit(ctx.f);
+      }
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitDirIf(PBGrammarParser.DirIfContext ctx)
+  {
+    if (definemap.containsKey(ctx.getChild(1).getText()))
+      {
+	visit(ctx.getChild(2));
+	return new DBoolean(true);
+      }
+    return new DBoolean(false);
+  }
+
+  @Override
+  public Data visitDirElif(PBGrammarParser.DirElifContext ctx)
+  {
+    if (definemap.containsKey(ctx.getChild(1).getText()))
+      {
+	visit(ctx.getChild(2));
+	return new DBoolean(true);
+      }
+    if (ctx.getChildCount() == 4) return visit(ctx.getChild(4));
+    return new DBoolean(false);
+  }
+
+  @Override
+  public Data visitDirElse(PBGrammarParser.DirElseContext ctx)
+  {
+    return visit(ctx.getChild(1));
+  }
+
+  @Override
+  public Data visitAssignVal(PBGrammarParser.AssignValContext ctx)
+  {
+    char id = ctx.getText().charAt(0);
+    Data val = visit(ctx.getChild(1));
+    switch (id)
+      {
+      case ' ':
+	System.out.println(val);
+	break;
+      case '\t':
+	System.err.println(val);
+      case '_':
+	break;
+      case '!':
+	throw new RuntimeException(val.toString());
+      default:
+	varmap.put(id, val);
+      }
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitIfBlock(PBGrammarParser.IfBlockContext ctx)
+  {
+    if (visit(ctx.getChild(1)).isTruthy())
+      {
+	for (int i = 2; i < ctx.getChildCount() - 1; i++)
+	  {
+	    visit(ctx.getChild(i));
+	  }
+      }
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitExprAddLike(PBGrammarParser.ExprAddLikeContext ctx)
+  {
+    Data left = visit(ctx.getChild(0));
+    Data right = visit(ctx.getChild(2));
+    switch (ctx.getChild(1).getText())
+      {
+      case "+":
+	return left.plus(right);
+      case "-":
+	return left.minus(right);
+      }
+    return DEmpty.getInstance();
+  }
+
+
+  @Override
+  public Data visitExprMulLike(PBGrammarParser.ExprMulLikeContext ctx)
+  {
+    Data left = visit(ctx.getChild(0));
+    Data right = visit(ctx.getChild(2));
+    switch (ctx.getChild(1).getText())
+      {
+      case "*":
+	return left.times(right);
+      case "/":
+	return left.divide(right);
+      case "%":
+	return left.modulo(right);
+      }
+    return DEmpty.getInstance();
+  }
+
+
+  @Override
+  public Data visitExprSubscript(PBGrammarParser.ExprSubscriptContext ctx)
+  {
+    Data left = visit(ctx.getChild(0));
+    Data right = visit(ctx.getChild(2));
+    return left.subscript(right);
+  }
+
+  @Override
+  public Data visitExprNotEquals(PBGrammarParser.ExprNotEqualsContext ctx)
+  {
+    Data left = visit(ctx.getChild(0));
+    Data right = visit(ctx.getChild(2));
+    return new DBoolean(!left.equals(right));
+  }
+
+  @Override
+  public Data visitExprRelLike(PBGrammarParser.ExprRelLikeContext ctx)
+  {
+    Data left = visit(ctx.getChild(0));
+    Data right = visit(ctx.getChild(2));
+    switch (ctx.getChild(1).getText())
+      {
+      case "<":
+	return left.lessThan(right);
+      case ">":
+	return left.moreThan(right);
+      }
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitExprBracket(PBGrammarParser.ExprBracketContext ctx)
+  {
+    return visit(ctx.getChild(1));
+  }
+
+  @Override
+  public Data visitDataTuple(PBGrammarParser.DataTupleContext ctx)
+  {
+    final int childCount = ctx.getChildCount();
+    if (childCount == 2) return new DTuple();
+    final List<Data> lst = new ArrayList<>(childCount - 2);
+    for (int i = 1; i < childCount - 1; i++)
+      {
+	lst.add(visit(ctx.getChild(i)));
+      }
+    return new DTuple(lst);
+  }
+
+  @Override
+  public Data visitDataCond(PBGrammarParser.DataCondContext ctx)
+  {
+    final int childCount = ctx.getChildCount() - 1;
+    boolean d = visit(ctx.getChild(1)).isTruthy();
+    if (childCount - 1 > 1)
+      {
+        if (d)
+	  {
+	    Data lastOp = DEmpty.getInstance();
+	    for (int i = 2; i < childCount; i++)
+	      {
+		lastOp = visit(ctx.getChild(i));
+	      }
+	    return lastOp;
+	  }
+	else return DEmpty.getInstance();
+      }
+    else return new DBoolean(!d);
+  }
+
+  @Override
+  public Data visitDataText(PBGrammarParser.DataTextContext ctx)
+  {
+    String raw = ctx.getText();
+    if (raw.length() == 2) return new DString("");
+    int newlen = raw.length();
+    char c;
+    do
+      {
+        c = raw.charAt(--newlen);
+      }
+    while(c == '\r' || c == '\n');
+    return new DString(raw.substring(2, newlen + 1));
+  }
+
+  @Override
+  public Data visitDataRtext(PBGrammarParser.DataRtextContext ctx)
+  {
+    String raw = ctx.getText();
+    if (raw.length() == 4) return new DString("");
+    return new DString(raw.substring(2, raw.length() - 2));
+  }
+
+  @Override
+  public Data visitDataNumber(PBGrammarParser.DataNumberContext ctx)
+  {
+    return new DNumber(Double.parseDouble(ctx.getText()));
+  }
+
+  @Override
+  public Data visitDataRead(PBGrammarParser.DataReadContext ctx)
+  {
+    char id = ctx.getText().charAt(1);
+    switch (id)
+      {
+      case ' ':
+	if (SYSIN.hasNextLine()) return new DString(SYSIN.nextLine());
+	return new DString("");
+      case '\t':
+	if (SYSIN.hasNextDouble()) return new DNumber(SYSIN.nextDouble());
+	return new DNumber(0);
+      case '_':
+	return new DNumber(Math.random());
+      default:
+	if (varmap.containsKey(id)) return varmap.get(id).copy();
+      case '!':
+	return DEmpty.getInstance();
+      }
+  }
+}
+

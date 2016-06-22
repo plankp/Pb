@@ -7,17 +7,43 @@ if exists("b:current_syntax")
 	finish
 endif
 
-syn match pbNumber '_?(0|(1-9][0-9]*))(\.[0-9]+)?'
+syn keyword PRE_ENDIF endif ENDIF
+syn keyword PRE_ELSE else ELSE
+syn keyword PRE_ELSEIF elseif ELSEIF
+syn keyword PRE_IFDEF ifdef IFDEF
+syn keyword PRE_UNDEF undef UNDEF
+syn keyword PRE_DEFINE define DEFINE
+syn keyword PRE_ENDMAC endmac ENDMAC
+syn keyword PRE_MACRO macro MACRO
+syn keyword PRE_CALL call CALL
+
+syn keyword DO_WHILE <<
+syn keyword WHILE_DO >>
+
+syn match pbNumber '(0|(1-9][0-9]*))(\.[0-9]+)?'
 syn match pbReadId '@.'
 syn match pbAssign '.='
 syn match lcomment '# .*$'
 
 syn region pbString start='%%' end='%%'
 
-let b:current_syntax = "pb"
+let b:current_syntax = "pbscript"
+
+hi def link PRE_ENDIF	Keyword
+hi def link PRE_ELSE	Keyword
+hi def link PRE_ELSEIF	Keyword
+hi def link PRE_IFDEF	Keyword
+hi def link PRE_UNDEF	Keyword
+hi def link PRE_DEFINE	Keyword
+hi def link PRE_ENDMAC	Keyword
+hi def link PRE_MACRO	Keyword
+hi def link PRE_CALL	Keyword
+
+hi def link DO_WHILE	Repeat
+hi def link WHILE_DO	Repeat
 
 hi def link lcomment	Comment
-hi def link pbString	Constant
-hi def link pbNumber	Constant
-hi def link pbReadId	Constant
+hi def link pbString	String
+hi def link pbNumber	Number
+hi def link pbReadId	Identifier
 hi def link pbAssign	Statement

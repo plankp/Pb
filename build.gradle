@@ -1,12 +1,18 @@
 apply plugin: 'java'
+apply plugin: 'antlr'
 apply plugin: 'application'
 
 mainClassName = 'App'
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
     testCompile 'junit:junit:4.12'
+    antlr 'org.antlr:antlr4:4.5'
+}
+
+generateGrammarSource {
+  arguments += ['-visitor', '-no-listener']
 }
