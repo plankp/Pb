@@ -27,9 +27,9 @@ The tar and zip files are the finished productions.
 
 | Precedence  | Operator  | Description  |
 |-------------|-----------|--------------|
-|      1      |     :     | Subscripting |
-|      2      |   * / %   | Multiplication, division, and remainder |
-|      3      |    + -    | Addition and subtraction |
-|      4      |    < >    | Relational operators |
-|      5      |    <>     |  Not equals  |
+|      1      |    `:`    | Subscripting |
+|      2      |`*` `/` `%`| Multiplication, division, and remainder |
+|      3      |  `+` `-`  | Addition and subtraction |
+|      4      |  `<` `>`  | Relational operators |
+|      5      |   `<>`    |  Not equals  |
 
