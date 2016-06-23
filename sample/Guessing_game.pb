@@ -16,7 +16,7 @@
 		[(@i < @y)  = %%Not enough%%]
 		[(@i > @y)  = %%Too much%%]
 	] << (@y <> @i)
-	 = %%You took %% + ((@t + %%%%) % %%\.%% : 0) + #  try(s)
+	 = %%You took %% + ((@t + %%%%) % %%\.%%) : 0 + #  try(s)
 ]
 !ENDMAC
 

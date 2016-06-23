@@ -20,3 +20,16 @@ Open the terminal and type in
 
 Then open the directory `build/distributions`.
 The tar and zip files are the finished productions.
+
+## Potential Useful Information?
+
+### Operator Precedence
+
+| Precedence  | Operator  | Description  |
+|-------------|-----------|--------------|
+|      1      |     :     | Subscripting |
+|      2      |   * / %   | Multiplication, division, and remainder |
+|      3      |    + -    | Addition and subtraction |
+|      4      |    < >    | Relational operators |
+|      5      |    <>     |  Not equals  |
+

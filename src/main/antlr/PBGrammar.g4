@@ -42,11 +42,11 @@ stmt
   ;
 
 expr
-  : expr (TIMES | DIVIDE | MODULO) expr	# exprMulLike
+  : expr SUBSCRIPT expr			# exprSubscript
+  | expr (TIMES | DIVIDE | MODULO) expr	# exprMulLike
   | expr (PLUS | MINUS) expr		# exprAddLike
-  | expr SUBSCRIPT expr			# exprSubscript
-  | expr NE expr			# exprNotEquals
   | expr (LT | GT) expr			# exprRelLike
+  | expr NE expr			# exprNotEquals
   | LPAREN expr RPAREN			# exprBracket
   | LTUPLE expr* RTUPLE			# dataTuple
   | LBLOCK expr+ RBLOCK			# dataCond
