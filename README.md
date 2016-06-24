@@ -33,3 +33,12 @@ The tar and zip files are the finished productions.
 |      4      |  `<` `>`  | Relational operators |
 |      5      |   `<>`    |  Not equals  |
 
+### Directive Cheatsheet
+
+| Name | Alternative name | Description |
+|------|------------------|-------------|
+|`!CALL` | `!call`            |Calls a macro|
+|`!MACRO` to `!ENDMAC`| `!macro` to `!endmac` |Define a macro|
+|`!DEFINE`|`!define`| Defines a constant value |
+|`!UNDEF`|`!undef`| Undefines a constant value |
+|`!INCLUDE`|`!include`| Expands a file (same interpret unit) |
