@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+import java.io.File;
 import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public class App
 	PBGrammarLexer lexer = new PBGrammarLexer(ins);
 	TokenStream tokens = new CommonTokenStream(lexer);
 	PBGrammarParser parser = new PBGrammarParser(tokens);
-	new PBImplVisitor().visit(parser.prog());
+	new PBImplVisitor(args[0]).visit(parser.prog());
       }
     catch (java.io.IOException ex)
       {
@@ -57,7 +58,32 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
 
   private final Map<String, Data> definemap = new HashMap<>();
 
+  private final Map<String, List<PBGrammarParser.StmtContext>> macromap =
+    new HashMap<>();
+
+  private File lastOpenedFile;
+
+  private static final List<File> includemap = new ArrayList<>();
+
   private static final Scanner SYSIN = new Scanner(System.in);
+
+  public PBImplVisitor()
+  {
+    lastOpenedFile = null;
+  }
+
+  public PBImplVisitor(String path)
+  {
+    File f = new File(path);
+    if (f.isFile())
+      {
+	if (includemap.contains(f))
+	  throw new RuntimeException(path + " was already included");
+	includemap.add(f);
+	lastOpenedFile = f.getParentFile();
+      }
+    else throw new IllegalArgumentException("path must be a file");
+  }
 
   @Override
   public Data visitProg(PBGrammarParser.ProgContext ctx)
@@ -95,9 +121,6 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
   {
     return DEmpty.getInstance();
   }
-
-  private final Map<String, List<PBGrammarParser.StmtContext>> macromap =
-    new HashMap<>();
 
   @Override
   public Data visitDirMacro(PBGrammarParser.DirMacroContext ctx)
@@ -149,6 +172,34 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
     if (!rst.isTruthy())
       {
 	if (ctx.f != null) visit(ctx.f);
+      }
+    return DEmpty.getInstance();
+  }
+
+  @Override
+  public Data visitDirInclude(PBGrammarParser.DirIncludeContext ctx)
+  {
+    String path = visit(ctx.getChild(1)).toString();
+    File f = new File(lastOpenedFile, path);
+    String prefPath = f.toPath().normalize().toString();
+    try
+      {
+	ANTLRInputStream ins = new ANTLRFileStream(prefPath);
+	if (includemap.contains(f))
+	  {
+	    System.out.println("[WARNING] " + prefPath + " has already been included");
+	  }
+	else includemap.add(f);
+	lastOpenedFile = f.getParentFile();
+
+	PBGrammarLexer lexer = new PBGrammarLexer(ins);
+	TokenStream tokens = new CommonTokenStream(lexer);
+	PBGrammarParser parser = new PBGrammarParser(tokens);
+	visit(parser.prog());
+      }
+    catch (java.io.IOException ex)
+      {
+	System.out.println("Exception when reading file " + prefPath);
       }
     return DEmpty.getInstance();
   }

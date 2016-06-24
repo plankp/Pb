@@ -16,6 +16,7 @@ syn keyword PRE_DEFINE define DEFINE
 syn keyword PRE_ENDMAC endmac ENDMAC
 syn keyword PRE_MACRO macro MACRO
 syn keyword PRE_CALL call CALL
+syn keyword INCLUDE include INCLUDE
 
 syn keyword DO_WHILE <<
 syn keyword WHILE_DO >>
@@ -28,6 +29,8 @@ syn match lcomment '# .*$'
 syn region pbString start='%%' end='%%'
 
 let b:current_syntax = "pbscript"
+
+hi def link INCLUDE	Include
 
 hi def link PRE_ENDIF	Keyword
 hi def link PRE_ELSE	Keyword
