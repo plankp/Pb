@@ -1,4 +1,6 @@
 # Pb
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/46502ab3518042fd84cb97dd873e011e)](https://www.codacy.com/app/plankp/Pb?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=plankp/Pb&amp;utm_campaign=Badge_Grade)
+
 Like lead. Like peanut butter. 
 
 Back again but this time, lexing and parsing is done with ANTLR4.
