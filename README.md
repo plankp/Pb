@@ -1,5 +1,6 @@
 # Pb
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/46502ab3518042fd84cb97dd873e011e)](https://www.codacy.com/app/plankp/Pb?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=plankp/Pb&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/plankp/Pb.svg?branch=master)](https://travis-ci.org/plankp/Pb)
 
 Like lead. Like peanut butter. 
 
