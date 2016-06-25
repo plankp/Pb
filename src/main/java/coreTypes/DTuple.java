@@ -101,7 +101,7 @@ public final class DTuple extends Data implements ISizable
   public Data subscript(Data d)
   {
     if (d instanceof DNumber) return data.get((int) ((DNumber) d).toDouble());
-    else throw new RuntimeException
+    else throw new UnsupportedOperationException
 	   ("Cannot apply DTuple : " + d.getClass().getSimpleName());
   }
   
@@ -144,8 +144,8 @@ public final class DTuple extends Data implements ISizable
       {
 	return new DBoolean(data.size() < ((ISizable) d).getSize());
       }
-    throw new RuntimeException("Cannot apply DTuple < "
-			       + d.getClass().getSimpleName());
+    throw new UnsupportedOperationException("Cannot apply DTuple < " +
+					    d.getClass().getSimpleName());
   }
 
   @Override
@@ -155,8 +155,8 @@ public final class DTuple extends Data implements ISizable
       {
 	return new DBoolean(data.size() > ((ISizable) d).getSize());
       }
-    throw new RuntimeException("Cannot apply DTuple > "
-			       + d.getClass().getSimpleName());
+    throw new UnsupportedOperationException("Cannot apply DTuple > " +
+					    d.getClass().getSimpleName());
   }
 
   @Override

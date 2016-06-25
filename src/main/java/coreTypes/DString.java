@@ -63,7 +63,7 @@ public final class DString extends Data implements ISizable
       }
     else
       {
-	throw new RuntimeException
+	throw new UnsupportedOperationException
 	  ("Cannot apply DString - " + d.getClass().getSimpleName());
       }
     return this;
@@ -78,7 +78,7 @@ public final class DString extends Data implements ISizable
 	  (new char[(int) ((DNumber) d).toDouble()]).replace("\0", val);
 	return this;
       }
-    throw new RuntimeException
+    throw new UnsupportedOperationException
       ("Cannot apply DString - " + d.getClass().getSimpleName());
   }
 
@@ -89,7 +89,7 @@ public final class DString extends Data implements ISizable
       {
 	return new DNumber(val.split(d.toString()).length);
       }
-    throw new RuntimeException
+    throw new UnsupportedOperationException
       ("Cannot apply DString / " + d.getClass().getSimpleName());
   }
 
@@ -103,7 +103,7 @@ public final class DString extends Data implements ISizable
 	for (String s : arr) chunks.add(new DString(s));
 	return new DTuple(chunks);
       }
-    throw new RuntimeException
+    throw new UnsupportedOperationException
       ("Cannot apply DString % " + d.getClass().getSimpleName());
   }
 
@@ -115,7 +115,7 @@ public final class DString extends Data implements ISizable
 	val = String.valueOf(val.charAt((int) ((DNumber) d).toDouble()));
 	return this;
       }
-    throw new RuntimeException
+    throw new UnsupportedOperationException
       ("Cannot apply DString : " + d.getClass().getSimpleName());
   }
   
@@ -150,8 +150,8 @@ public final class DString extends Data implements ISizable
       {
 	return new DBoolean(val.length() < ((ISizable) d).getSize());
       }
-    throw new RuntimeException("Cannot apply DString < "
-			       + d.getClass().getSimpleName());
+    throw new UnsupportedOperationException("Cannot apply DString < " +
+					    d.getClass().getSimpleName());
   }
 
   @Override
@@ -161,8 +161,8 @@ public final class DString extends Data implements ISizable
       {
 	return new DBoolean(val.length() > ((ISizable) d).getSize());
       }
-    throw new RuntimeException("Cannot apply DString > "
-			       + d.getClass().getSimpleName());
+    throw new UnsupportedOperationException("Cannot apply DString > " +
+					    d.getClass().getSimpleName());
   }
 
   @Override

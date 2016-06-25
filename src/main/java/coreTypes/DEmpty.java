@@ -49,37 +49,37 @@ public final class DEmpty extends Data
   @Override
   public Data plus(Data d)
   {
-    throw new RuntimeException("Cannot apply Empty + Data");
+    throw new UnsupportedOperationException("Cannot apply Empty + Data");
   }
 
   @Override
   public Data minus(Data d)
   {
-    throw new RuntimeException("Cannot apply Empty - Data");
+    throw new UnsupportedOperationException("Cannot apply Empty - Data");
   }
 
   @Override
   public Data times(Data d)
   {
-    throw new RuntimeException("Cannot apply Empty * Data");
+    throw new UnsupportedOperationException("Cannot apply Empty * Data");
   }
 
   @Override
   public Data divide(Data d)
   {
-    throw new RuntimeException("Cannot apply Empty / Data");
+    throw new UnsupportedOperationException("Cannot apply Empty / Data");
   }
 
   @Override
   public Data modulo(Data d)
   {
-    throw new RuntimeException("Cannot apply Empty % Data");
+    throw new UnsupportedOperationException("Cannot apply Empty % Data");
   }
 
   @Override
   public Data subscript(Data d)
   {
-    throw new RuntimeException("Cannot apply Empty : Data");
+    throw new UnsupportedOperationException("Cannot apply Empty : Data");
   }
 
   @Override
@@ -103,19 +103,18 @@ public final class DEmpty extends Data
   @Override
   public DBoolean lessThan(Data d)
   {
-    throw new RuntimeException("Cannot apply Empty < Data");
+    throw new UnsupportedOperationException("Cannot apply Empty < Data");
   }
 
   @Override
   public DBoolean moreThan(Data d)
   {
-    throw new RuntimeException("Cannot apply Empty > Data");
+    throw new UnsupportedOperationException("Cannot apply Empty > Data");
   }
 
   @Override
   public boolean equals(Object o)
   {
-    if (o instanceof DEmpty) return true;
-    return false;
+    return o instanceof DEmpty;
   }
 }

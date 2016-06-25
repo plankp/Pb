@@ -83,7 +83,7 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
     if (f.isFile())
       {
 	if (includemap.contains(f))
-	  throw new RuntimeException(path + " was already included");
+	  throw new ParserInitException(path + " was already included");
 	includemap.add(f);
 	lastOpenedFile = f.getParentFile();
       }
@@ -253,9 +253,10 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
       case '_':
 	break;
       case '!':
-	throw new RuntimeException(val.toString());
+	throw new UserThrownException(val.toString());
       default:
 	varmap.put(id, val);
+	break;
       }
     return DEmpty.getInstance();
   }
@@ -278,14 +279,16 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
   {
     Data left = visit(ctx.getChild(0));
     Data right = visit(ctx.getChild(2));
-    switch (ctx.getChild(1).getText())
+    final String op = ctx.getChild(1).getText();
+    switch (op)
       {
       case "+":
 	return left.plus(right);
       case "-":
 	return left.minus(right);
+      default:
+	return DEmpty.getInstance();
       }
-    return DEmpty.getInstance();
   }
 
 
@@ -294,7 +297,8 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
   {
     Data left = visit(ctx.getChild(0));
     Data right = visit(ctx.getChild(2));
-    switch (ctx.getChild(1).getText())
+    final String op = ctx.getChild(1).getText();
+    switch (op)
       {
       case "*":
 	return left.times(right);
@@ -302,8 +306,9 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
 	return left.divide(right);
       case "%":
 	return left.modulo(right);
+      default:
+	return DEmpty.getInstance();
       }
-    return DEmpty.getInstance();
   }
 
 
@@ -328,14 +333,16 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
   {
     Data left = visit(ctx.getChild(0));
     Data right = visit(ctx.getChild(2));
-    switch (ctx.getChild(1).getText())
+    final String op = ctx.getChild(1).getText();
+    switch (op)
       {
       case "<":
 	return left.lessThan(right);
       case ">":
 	return left.moreThan(right);
+      default:
+	return DEmpty.getInstance();
       }
-    return DEmpty.getInstance();
   }
 
   @Override

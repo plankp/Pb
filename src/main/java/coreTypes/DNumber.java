@@ -74,7 +74,7 @@ public class DNumber extends Data
 	  }
 	return tuple;
       }
-    else throw new RuntimeException
+    else throw new UnsupportedOperationException
 	   ("Cannot apply DNumber - " + d.getClass().getSimpleName());
   }
 
@@ -95,7 +95,7 @@ public class DNumber extends Data
 	  }
 	return tuple;
       }
-    else throw new RuntimeException
+    else throw new UnsupportedOperationException
 	   ("Cannot apply DNumber * " + d.getClass().getSimpleName());
   }
 
@@ -116,7 +116,7 @@ public class DNumber extends Data
 	  }
 	return tuple;
       }
-    else throw new RuntimeException
+    else throw new UnsupportedOperationException
 	   ("Cannot apply DNumber / " + d.getClass().getSimpleName());
   }
 
@@ -140,7 +140,7 @@ public class DNumber extends Data
 	  }
 	return tuple;
       }
-    else throw new RuntimeException
+    else throw new UnsupportedOperationException
 	   ("Cannot apply DNumber % " + d.getClass().getSimpleName());
   }
 
@@ -162,7 +162,7 @@ public class DNumber extends Data
 	  }
 	return tuple;
       }
-    else throw new RuntimeException
+    else throw new UnsupportedOperationException
 	   ("Cannot apply DNumber : " + d.getClass().getSimpleName());
   }
   
@@ -191,8 +191,8 @@ public class DNumber extends Data
       {
 	return new DBoolean(val < ((DNumber) d).val);
       }
-    throw new RuntimeException("Cannot apply DNumber < " +
-			       d.getClass().getSimpleName());
+    throw new UnsupportedOperationException("Cannot apply DNumber < " +
+					    d.getClass().getSimpleName());
   }
 
   @Override
@@ -202,8 +202,8 @@ public class DNumber extends Data
       {
 	return new DBoolean(val > ((DNumber) d).val);
       }
-    throw new RuntimeException("Cannot apply DNumber > " +
-			       d.getClass().getSimpleName());
+    throw new UnsupportedOperationException("Cannot apply DNumber > " +
+					    d.getClass().getSimpleName());
   }
 
   @Override
