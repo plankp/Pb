@@ -30,7 +30,7 @@ import coreTypes.DBoolean;
 
 public abstract class Data implements Serializable
 {
-  private final long serialVersionUID = -128348263L;
+  private final long serialVersionUID = 8175396986468597520L;
 
   public abstract Data plus(Data d);
 
