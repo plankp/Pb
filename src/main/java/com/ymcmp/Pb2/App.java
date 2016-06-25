@@ -170,14 +170,8 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
   public Data visitDirIfCond(PBGrammarParser.DirIfCondContext ctx)
   {
     Data rst = visit(ctx.getChild(0));
-    if (!rst.isTruthy())
-      {
-	if (ctx.r != null) rst = visit(ctx.r);
-      }
-    if (!rst.isTruthy())
-      {
-	if (ctx.f != null) visit(ctx.f);
-      }
+    if (!rst.isTruthy() && ctx.r != null) rst = visit(ctx.r);
+    if (!rst.isTruthy() && ctx.f != null) visit(ctx.f);
     return DEmpty.getInstance();
   }
 
@@ -250,6 +244,7 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
 	break;
       case '\t':
 	System.err.println(val);
+	break;
       case '_':
 	break;
       case '!':
