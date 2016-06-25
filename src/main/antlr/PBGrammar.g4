@@ -38,7 +38,7 @@ stmt
   | MACRO IDENT stmt+ ENDMAC		# dirMacro
   | DEFINE IDENT expr			# dirDef
   | UNDEF IDENT				# dirUndef
-  | dirIf r=dirElif? f=dirElse? ENDIF	# dirIfdef
+  | dirIf r=dirElif? f=dirElse? ENDIF	# dirIfCond
   | INCLUDE expr			# dirInclude
   ;
 
@@ -55,18 +55,23 @@ expr
   | RTEXT				# dataRtext
   | NUMBER				# dataNumber
   | READ				# dataRead
+  | IDENT d=IS_DEFINED?			# dataDefined
   ;
 
 dirIf
-  : IFDEF IDENT stmt
+  : IF expr stmt
   ;
 
 dirElif
-  : ELSEIF IDENT stmt dirElif?
+  : ELSEIF expr stmt dirElif?
   ;
 
 dirElse
   : ELSE stmt
+  ;
+
+IS_DEFINED
+  : '?'
   ;
 
 INCLUDE
@@ -103,9 +108,9 @@ UNDEF
   | '!UNDEF'
   ;
 
-IFDEF
-  : '!ifdef'
-  | '!IFDEF'
+IF
+  : '!if'
+  | '!IF'
   ;
 
 ELSEIF

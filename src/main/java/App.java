@@ -162,7 +162,7 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
   }
 
   @Override
-  public Data visitDirIfdef(PBGrammarParser.DirIfdefContext ctx)
+  public Data visitDirIfCond(PBGrammarParser.DirIfCondContext ctx)
   {
     Data rst = visit(ctx.getChild(0));
     if (!rst.isTruthy())
@@ -207,7 +207,7 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
   @Override
   public Data visitDirIf(PBGrammarParser.DirIfContext ctx)
   {
-    if (definemap.containsKey(ctx.getChild(1).getText()))
+    if (visit(ctx.getChild(1)).isTruthy())
       {
 	visit(ctx.getChild(2));
 	return new DBoolean(true);
@@ -218,7 +218,7 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
   @Override
   public Data visitDirElif(PBGrammarParser.DirElifContext ctx)
   {
-    if (definemap.containsKey(ctx.getChild(1).getText()))
+    if (visit(ctx.getChild(1)).isTruthy())
       {
 	visit(ctx.getChild(2));
 	return new DBoolean(true);
@@ -421,6 +421,23 @@ class PBImplVisitor extends PBGrammarBaseVisitor<Data>
       case '!':
 	return DEmpty.getInstance();
       }
+  }
+
+  @Override
+  public Data visitDataDefined(PBGrammarParser.DataDefinedContext ctx)
+  {
+    String id = ctx.getChild(0).getText();
+    boolean testForDefined = ctx.d != null;
+
+    if (testForDefined)
+      {
+	return new DBoolean(definemap.containsKey(id));
+      }
+    if (definemap.containsKey(id))
+      {
+        return definemap.get(id);
+      }
+    return new DString(id);
   }
 }
 

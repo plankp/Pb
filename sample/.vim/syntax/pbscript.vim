@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language: Pbscript
 " Maintainer: Plankp T.
-" Latest Revision: 20 June 2016
+" Latest Revision: 24 June 2016
 
 if exists("b:current_syntax")
 	finish
@@ -10,7 +10,7 @@ endif
 syn keyword PRE_ENDIF endif ENDIF
 syn keyword PRE_ELSE else ELSE
 syn keyword PRE_ELSEIF elseif ELSEIF
-syn keyword PRE_IFDEF ifdef IFDEF
+syn keyword PRE_IF if IF
 syn keyword PRE_UNDEF undef UNDEF
 syn keyword PRE_DEFINE define DEFINE
 syn keyword PRE_ENDMAC endmac ENDMAC
@@ -18,8 +18,8 @@ syn keyword PRE_MACRO macro MACRO
 syn keyword PRE_CALL call CALL
 syn keyword INCLUDE include INCLUDE
 
-syn keyword DO_WHILE <<
-syn keyword WHILE_DO >>
+syn match DO_WHILE '<<'
+syn match WHILE_DO '>>'
 
 syn match pbNumber '(0|(1-9][0-9]*))(\.[0-9]+)?'
 syn match pbReadId '@.'
@@ -35,7 +35,7 @@ hi def link INCLUDE	Include
 hi def link PRE_ENDIF	Keyword
 hi def link PRE_ELSE	Keyword
 hi def link PRE_ELSEIF	Keyword
-hi def link PRE_IFDEF	Keyword
+hi def link PRE_IF	Keyword
 hi def link PRE_UNDEF	Keyword
 hi def link PRE_DEFINE	Keyword
 hi def link PRE_ENDMAC	Keyword

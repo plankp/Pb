@@ -22,7 +22,7 @@
 
 !DEFINE COND 1
 
-!IFDEF COND
+!IF [COND? <> [COND <> 1]]
 !CALL GUESS
 !ELSE
  = # This module is disabled

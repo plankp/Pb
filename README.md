@@ -21,6 +21,11 @@ Open the terminal and type in
 Then open the directory `build/distributions`.
 The tar and zip files are the finished productions.
 
+## Recommended Coding Environment
+
+At the moment, the only "one" I have written is for VIM.
+To apply it, simply copy the contents inside `sample/.vim` into `~/.vim` and then save Pb code with the extension `.pb` or `.pbscript`.
+
 ## Potential Useful Information?
 
 ### Operator Precedence
@@ -32,6 +37,7 @@ The tar and zip files are the finished productions.
 |      3      |  `+` `-`  | Addition and subtraction |
 |      4      |  `<` `>`  | Relational operators |
 |      5      |   `<>`    |  Not equals  |
+|             |    `?`    |  If identifier is defined |
 
 ### Directive Cheatsheet
 
@@ -42,3 +48,4 @@ The tar and zip files are the finished productions.
 |`!DEFINE`|`!define`| Defines a constant value |
 |`!UNDEF`|`!undef`| Undefines a constant value |
 |`!INCLUDE`|`!include`| Expands a file (same interpret unit) |
+| `!IF`, `!ELSEIF`, `!ELSE` to `!ENDIF` | `!if`, `!elseif`, `!else` to `!endif` | Conditional interpreting |
