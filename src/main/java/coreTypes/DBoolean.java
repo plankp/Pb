@@ -22,7 +22,30 @@
  * SOFTWARE.
  */
 
-public interface ISizable
+package coreTypes;
+
+public final class DBoolean extends DNumber
 {
-  public int getSize();
+  public DBoolean(boolean b)
+  {
+    super(b ? 1 : 0);
+  }
+
+  @Override
+  public String toString()
+  {
+    return String.valueOf(val == 0);
+  }
+
+  @Override
+  public boolean isTruthy()
+  {
+    return val != 0;
+  }
+
+  public DBoolean not()
+  {
+    val = val != 0 ? 0 : 1;
+    return this;
+  }
 }

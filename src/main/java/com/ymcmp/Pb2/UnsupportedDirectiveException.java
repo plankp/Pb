@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+package com.ymcmp.Pb2;
+
 public class UnsupportedDirectiveException extends RuntimeException
 {
   public UnsupportedDirectiveException(String directiveName)
