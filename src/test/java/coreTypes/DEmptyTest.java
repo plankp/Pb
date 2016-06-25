@@ -31,7 +31,7 @@ public class DEmptyTest
 {
 
   @Test
-  public void ShouldFailPlus()
+  public void shouldFailPlus()
   {
     try
       {
@@ -44,7 +44,7 @@ public class DEmptyTest
   }
   
   @Test
-  public void ShouldFailMinus()
+  public void shouldFailMinus()
   {
     try
       {
@@ -57,7 +57,7 @@ public class DEmptyTest
   }
 
   @Test
-  public void ShouldFailTimes()
+  public void shouldFailTimes()
   {
     try
       {
@@ -70,7 +70,7 @@ public class DEmptyTest
   }
 
   @Test
-  public void ShouldFailDivide()
+  public void shouldFailDivide()
   {
     try
       {
@@ -83,7 +83,7 @@ public class DEmptyTest
   }
 
   @Test
-  public void ShouldFailModulo()
+  public void shouldFailModulo()
   {
     try
       {
@@ -96,7 +96,7 @@ public class DEmptyTest
   }
 
   @Test
-  public void ShouldFailSubscript()
+  public void shouldFailSubscript()
   {
     try
       {
